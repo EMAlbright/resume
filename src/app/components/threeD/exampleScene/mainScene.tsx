@@ -45,6 +45,12 @@ const ThreeScene: React.FC = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
+    // add light
+    const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+    scene.add(ambientLight);
+
+    
+
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
@@ -138,16 +144,19 @@ const ThreeScene: React.FC = () => {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.update();
 
-        //add name 
-        const nameMesh = Name();
-        scene.add(nameMesh)
-
     }, undefined, function (error){
         console.error(error);
     });
 
+    //add name 
+    const nameMesh = Name();
+    scene.add(nameMesh);
+
+    const clock = new THREE.Clock();
     const animate = () => {
       requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+      nameMesh.position.y = 3 + Math.sin(elapsedTime) * 0.5;
       composer.render();
     };
 
