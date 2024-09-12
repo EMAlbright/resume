@@ -7,6 +7,8 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import Name from '../name/name';
+import Instructions from '../instructions/instructions';
+import CreateBubble from '../experience/experience';
 // create texture circle
 const createCircleTexture = () => {
     const canvas = document.createElement('canvas');
@@ -46,7 +48,7 @@ const ThreeScene: React.FC = () => {
     mountRef.current.appendChild(renderer.domElement);
 
     // add light
-    const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+    const ambientLight = new THREE.AmbientLight(0x404040); 
     scene.add(ambientLight);
 
     
@@ -78,9 +80,6 @@ const ThreeScene: React.FC = () => {
         // add model to scene
         model.position.sub(center);
         scene.add(model);
-
-        // max dimensions
-        const maxDimension = Math.max(size.x, size.y, size.z);
 
         let maxDistance = 0;
 
@@ -138,7 +137,7 @@ const ThreeScene: React.FC = () => {
             }
         });
         
-        camera.position.set(0, 0, maxDimension * 1.5);
+        camera.position.set(-0.197375, 2.1954194, 7.199677);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -152,11 +151,33 @@ const ThreeScene: React.FC = () => {
     const nameMesh = Name();
     scene.add(nameMesh);
 
+    //add asteroids for instructions
+    const asteroids = Instructions();
+    scene.add(asteroids);
+
+    //bubble for resume information
+    const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
+    const tealBubble = CreateBubble(0x0ff0ff, .5, .7, -.5);
+    const pinkBubble = CreateBubble(0xdb4a8f, .8, .5, .65);
+
+
+    scene.add(pinkBubble);
+    scene.add(yellowBubble);
+    scene.add(tealBubble);
+    
     const clock = new THREE.Clock();
     const animate = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
-      nameMesh.position.y = 3 + Math.sin(elapsedTime) * 0.5;
+      // name float
+      nameMesh.position.y = 3 + Math.sin(elapsedTime) * 0.1;
+      
+      // float bubbles
+      yellowBubble.position.y = .75 + Math.sin(elapsedTime) * 0.07;
+      tealBubble.position.y = .75 + Math.sin(elapsedTime+1) * 0.04;
+      pinkBubble.position.y = .75 + Math.sin(elapsedTime+2) * 0.04;
+
+      asteroids.rotateY(.001);
       composer.render();
     };
 

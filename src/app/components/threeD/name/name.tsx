@@ -21,7 +21,7 @@ const Name = () => {
         const textMesh = new THREE.Mesh(textGeometry, textMaterial);
         
         textMesh.position.set(0, 0, 2);
-        textMesh.rotation.set(.25, 0, 0);
+        textMesh.rotation.set(0, 0, 0);
 
         // center text
         textGeometry.center();
