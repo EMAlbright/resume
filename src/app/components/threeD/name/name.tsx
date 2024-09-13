@@ -7,8 +7,7 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 const Name = () => {
     const group = new THREE.Group();
     const font = new FontLoader();
-    //for floating
-    const clock = new THREE.Clock()
+
     font.load('/fonts/gentilis_bold.typeface.json', (fontText) => {
         const textGeometry = new TextGeometry('   Ethan Albright\nSoftware Engineer', {
             font: fontText,

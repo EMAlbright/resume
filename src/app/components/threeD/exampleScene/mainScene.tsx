@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -9,6 +9,11 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import Name from '../name/name';
 import Instructions from '../instructions/instructions';
 import CreateBubble from '../experience/experience';
+import CreateText from '../createText/createText';
+import { Float } from '../../animations/updateBubbles';
+import { useRouter } from 'next/router';
+import { LoadingScreen } from '../../loadingScreen/loadScreen';
+
 // create texture circle
 const createCircleTexture = () => {
     const canvas = document.createElement('canvas');
@@ -27,7 +32,14 @@ const createCircleTexture = () => {
 
 const ThreeScene: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const bubblesRef = useRef<THREE.Mesh[]>([]);
   const loader = new GLTFLoader();
+
+  const mouse = new THREE.Vector2();
+  const rayCaster = new THREE.Raycaster();
+
+  // route to experience, education ,projects pages
+  const router = useRouter();
 
   const params = {
     bloomStrength: 5,
@@ -51,7 +63,7 @@ const ThreeScene: React.FC = () => {
     const ambientLight = new THREE.AmbientLight(0x404040); 
     scene.add(ambientLight);
 
-    
+    const controls = new OrbitControls(camera, renderer.domElement);
 
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
@@ -69,7 +81,7 @@ const ThreeScene: React.FC = () => {
     composer.addPass(bloomPass);
 
     // load in particle model
-    loader.load('/models/scene.gltf', function(gltf){
+    loader.load('/models/scene.gltf', (gltf) => {
         const model = gltf.scene;
         // get center and size of model
         const boundingBox = new THREE.Box3().setFromObject(model);
@@ -140,12 +152,31 @@ const ThreeScene: React.FC = () => {
         camera.position.set(-0.197375, 2.1954194, 7.199677);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-        const controls = new OrbitControls(camera, renderer.domElement);
         controls.update();
 
     }, undefined, function (error){
         console.error(error);
     });
+
+    // mouse event listeneer
+    const onMouseMove = (event: MouseEvent) => {
+        // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;    
+    };
+
+    // click event listener
+    const onMouseClick = (event: MouseEvent) => {
+      const destination = '/';
+      router.push({
+        pathname: '../../loadingScreen/loadScreen.tsx',
+        query: {destination}
+      });
+    };
+
+
+    window.addEventListener('mousemove', onMouseMove, false);
+    window.addEventListener('click', onMouseClick, false);
 
     //add name 
     const nameMesh = Name();
@@ -159,36 +190,56 @@ const ThreeScene: React.FC = () => {
     const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
     const tealBubble = CreateBubble(0x0ff0ff, .5, .7, -.5);
     const pinkBubble = CreateBubble(0xdb4a8f, .8, .5, .65);
+    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble);
 
+    //text
+    const experience = CreateText("Experience", 0xdb4a8f, .1, -.75, .65, .25);
+    const education = CreateText("Education", 0x0ff0ff, .1, .8, .5, .65);
+    const projects = CreateText("Projects", 0xffd700, .1, .5, .7, -.5);
 
     scene.add(pinkBubble);
+    scene.add(education);
     scene.add(yellowBubble);
+    scene.add(experience);
     scene.add(tealBubble);
+    scene.add(projects);
     
     const clock = new THREE.Clock();
     const animate = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
-      // name float
-      nameMesh.position.y = 3 + Math.sin(elapsedTime) * 0.1;
-      
-      // float bubbles
-      yellowBubble.position.y = .75 + Math.sin(elapsedTime) * 0.07;
-      tealBubble.position.y = .75 + Math.sin(elapsedTime+1) * 0.04;
-      pinkBubble.position.y = .75 + Math.sin(elapsedTime+2) * 0.04;
 
-      asteroids.rotateY(.001);
+      rayCaster.setFromCamera(mouse, camera);
+
+      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
+      bubblesRef.current.forEach(bubble => bubble.scale.set(1, 1, 1));
+
+      if (intersectBounds.length > 0){
+        const hoveredBubble = intersectBounds[0].object as THREE.Mesh;
+        console.log(hoveredBubble);
+        hoveredBubble.scale.set(1.1, 1.1, 1.1);
+      }
+
+
+      // float bubbles
+      Float(elapsedTime, nameMesh, pinkBubble, education, yellowBubble, experience, tealBubble, projects);
+
+      asteroids.rotateY(.0015);
+      
       composer.render();
+      controls.update();
     };
 
     animate();
 
     return () => {
       if (mountRef.current) {
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('click', onMouseClick);
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [router]);
 
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };
