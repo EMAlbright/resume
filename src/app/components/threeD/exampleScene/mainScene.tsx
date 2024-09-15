@@ -8,11 +8,10 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import Name from '../name/name';
 import Instructions from '../instructions/instructions';
-import CreateBubble from '../experience/experience';
+import CreateBubble from '../bubbleCreation/createBubble';
 import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
-import { useRouter } from 'next/router';
-import { LoadingScreen } from '../../loadingScreen/loadScreen';
+import { useRouter } from 'next/navigation';
 
 // create texture circle
 const createCircleTexture = () => {
@@ -167,11 +166,8 @@ const ThreeScene: React.FC = () => {
 
     // click event listener
     const onMouseClick = (event: MouseEvent) => {
-      const destination = '/';
-      router.push({
-        pathname: '../../loadingScreen/loadScreen.tsx',
-        query: {destination}
-      });
+      const destination = '/pages/experience';
+      router.push(destination);
     };
 
 
@@ -216,7 +212,6 @@ const ThreeScene: React.FC = () => {
 
       if (intersectBounds.length > 0){
         const hoveredBubble = intersectBounds[0].object as THREE.Mesh;
-        console.log(hoveredBubble);
         hoveredBubble.scale.set(1.1, 1.1, 1.1);
       }
 
@@ -233,13 +228,11 @@ const ThreeScene: React.FC = () => {
     animate();
 
     return () => {
-      if (mountRef.current) {
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('click', onMouseClick);
-        mountRef.current.removeChild(renderer.domElement);
+        mountRef.current?.removeChild(renderer.domElement);
       }
-    };
-  }, [router]);
+  });
 
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };
