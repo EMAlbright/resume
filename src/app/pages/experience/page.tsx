@@ -31,16 +31,22 @@ const ExperiencePage: React.FC = () => {
   // add linkedin: https://www.linkedin.com/in/ethan-albright-2928721b8/
   // add git: https://github.com/EMAlbright
   return (
-    <div className="w-full min-h-screen bg-black m-0 p-5">
-      <header className="flex gap-20 items-center">
+    <div className="w-full min-h-screen bg-black p-5">
+      <header className="flex items-center">
         <button 
-          className="px-10 py-2.5 bg-[#db4a8f] text-white rounded cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#ff69b4]"
+          className="-mt-28 px-10 py-2.5 bg-[#db4a8f] text-white rounded cursor-pointer transition-colors duration-300 ease-in-out hover:bg-[#ff69b4]"
           onClick={() => window.history.back()}
         >
           Back
         </button>
-        <a className="pl-10" href='https://www.linkedin.com/in/ethan-albright-2928721b8/'><img src='/images/linkedin.png'></img></a>
-        <a href='https://github.com/EMAlbright'><img src='/images/github.png'></img></a>
+        <div className="flex gap-20 px-40 ml-96">
+          <a className='-mt-8' href='https://www.linkedin.com/in/ethan-albright-2928721b8/' target='_blank'>
+            <img src='/images/linkedin.png'></img>
+          </a>
+          <a href='https://github.com/EMAlbright' target='_blank'>
+            <img src='/images/github.png'></img>
+          </a>
+        </div>
       </header>
       
       <div className="flex flex-col items-center flex-wrap gap-20 padding-10 justify-center p-5">

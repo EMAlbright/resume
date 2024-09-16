@@ -13,6 +13,7 @@
     "react": "^18",
     "react-dom": "^18",
     "resume": "file:",
+    "stats.js": "^0.17.0",
     "three": "^0.168.0"
   },
   "devDependencies": {

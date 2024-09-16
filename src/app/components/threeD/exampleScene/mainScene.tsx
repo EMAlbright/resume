@@ -12,6 +12,11 @@ import CreateBubble from '../bubbleCreation/createBubble';
 import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
 import { useRouter } from 'next/navigation';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+
+var stats = new Stats();
+stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild( stats.dom );
 
 // create texture circle
 const createCircleTexture = () => {
@@ -30,6 +35,7 @@ const createCircleTexture = () => {
   }
 
 const ThreeScene: React.FC = () => {
+  stats.begin()
   const mountRef = useRef<HTMLDivElement>(null);
   const bubblesRef = useRef<THREE.Mesh[]>([]);
   const loader = new GLTFLoader();
@@ -41,7 +47,7 @@ const ThreeScene: React.FC = () => {
   const router = useRouter();
 
   const params = {
-    bloomStrength: 5,
+    bloomStrength: 2,
     bloomThreshold: 0,
     bloomRadius: .25
   }
@@ -55,7 +61,10 @@ const ThreeScene: React.FC = () => {
     const renderer = new THREE.WebGLRenderer();
 
     // set size to window h/l
+    const resolutionScale = 0.95;
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio * resolutionScale); // Reduce the pixel ratio
+
     mountRef.current.appendChild(renderer.domElement);
 
     // add light
@@ -207,7 +216,7 @@ const ThreeScene: React.FC = () => {
 
     //text
     const experience = CreateText("Experience", 0xdb4a8f, .1, -.75, .65, .25);
-    const education = CreateText("Education", 0x0ff0ff, .1, .8, .5, .65);
+    const education = CreateText("Education\n    Skills", 0x0ff0ff, .1, .8, .5, .65);
     const projects = CreateText("Projects", 0xffd700, .1, .5, .7, -.5);
 
     scene.add(pinkBubble);
@@ -243,8 +252,9 @@ const ThreeScene: React.FC = () => {
     };
 
     animate();
-
+    stats.end()
     return () => {
+        (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('click', onMouseClick);
         mountRef.current?.removeChild(renderer.domElement);
