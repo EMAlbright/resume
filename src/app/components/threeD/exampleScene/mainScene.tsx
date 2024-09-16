@@ -166,9 +166,23 @@ const ThreeScene: React.FC = () => {
 
     // click event listener
     const onMouseClick = (event: MouseEvent) => {
-      const destination = '/pages/experience';
+      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
+      console.log("ref", bubblesRef.current);
+      if(intersectBounds.length > 0){
+        const intersectedBubble = intersectBounds[0].object;
+        let destination = '';
+        console.log("bubble clicked:", intersectedBubble);
+        if (intersectedBubble.name === bubblesRef.current[0].name) {
+          destination = '/pages/experience';
+      } else if (intersectedBubble.name === bubblesRef.current[1].name) {
+          destination = '/pages/projects';
+      } else if (intersectedBubble.name === bubblesRef.current[2].name) {
+          destination = '/pages/education';
+      }
+
       router.push(destination);
     };
+  }
 
 
     window.addEventListener('mousemove', onMouseMove, false);
@@ -184,8 +198,11 @@ const ThreeScene: React.FC = () => {
 
     //bubble for resume information
     const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
+    yellowBubble.name = "experience";
     const tealBubble = CreateBubble(0x0ff0ff, .5, .7, -.5);
+    tealBubble.name = "projects";
     const pinkBubble = CreateBubble(0xdb4a8f, .8, .5, .65);
+    pinkBubble.name = "education";
     bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble);
 
     //text
