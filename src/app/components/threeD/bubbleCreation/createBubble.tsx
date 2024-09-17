@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Group } from 'three/examples/jsm/libs/tween.module.js';
 
 const CreateBubble = (color: any, x: number, y:number, z:number) => {
-
+    const group = new THREE.Group();
     const geometry = new THREE.SphereGeometry(.1, 32, 32);
 
     const sphereMaterial = new THREE.MeshPhysicalMaterial({
@@ -16,7 +16,7 @@ const CreateBubble = (color: any, x: number, y:number, z:number) => {
     });
 
     const sphere = new THREE.Mesh(geometry, sphereMaterial);
-    sphere.position.set(x, y, z);
+    sphere.position.set(x, y, z);  
     return sphere;
 }
 

@@ -11,8 +11,8 @@ import Instructions from '../instructions/instructions';
 import CreateBubble from '../bubbleCreation/createBubble';
 import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
-import { useRouter } from 'next/navigation';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
+import CreateLine from '../lineCreation/createLine';
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -37,14 +37,18 @@ const createCircleTexture = () => {
 const ThreeScene: React.FC = () => {
   stats.begin()
   const mountRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const composerRef = useRef<EffectComposer | null>(null);
   const bubblesRef = useRef<THREE.Mesh[]>([]);
+  const scrollIndexRef = useRef<number>(0);
+
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
   const loader = new GLTFLoader();
 
   const mouse = new THREE.Vector2();
   const rayCaster = new THREE.Raycaster();
-
-  // route to experience, education ,projects pages
-  const router = useRouter();
 
   const params = {
     bloomStrength: 2,
@@ -57,13 +61,13 @@ const ThreeScene: React.FC = () => {
 
     //create scene, camera , renderer
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    cameraRef.current = camera;
     const renderer = new THREE.WebGLRenderer();
 
     // set size to window h/l
-    const resolutionScale = 0.95;
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio * resolutionScale); // Reduce the pixel ratio
 
     mountRef.current.appendChild(renderer.domElement);
 
@@ -75,8 +79,14 @@ const ThreeScene: React.FC = () => {
 
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
+    composerRef.current = composer;
+
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
+
+    // info panel for educaitno, experience, projects
+    const infoPanel = createInfoPanel();
+    scene.add(infoPanel);
 
     // add glow / star effect with UnrealBloomPass
     const bloomPass = new UnrealBloomPass(
@@ -173,37 +183,11 @@ const ThreeScene: React.FC = () => {
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;    
     };
 
-    // click event listener
-    const onMouseClick = (event: MouseEvent) => {
-      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
-      console.log("ref", bubblesRef.current);
-      if(intersectBounds.length > 0){
-        const intersectedBubble = intersectBounds[0].object;
-        let destination = '';
-        console.log("bubble clicked:", intersectedBubble);
-        if (intersectedBubble.name === bubblesRef.current[0].name) {
-          destination = '/pages/experience';
-      } else if (intersectedBubble.name === bubblesRef.current[1].name) {
-          destination = '/pages/projects';
-      } else if (intersectedBubble.name === bubblesRef.current[2].name) {
-          destination = '/pages/education';
-      }
-
-      router.push(destination);
-    };
-  }
-
-
     window.addEventListener('mousemove', onMouseMove, false);
-    window.addEventListener('click', onMouseClick, false);
 
     //add name 
     const nameMesh = Name();
     scene.add(nameMesh);
-
-    //add asteroids for instructions
-    const asteroids = Instructions();
-    scene.add(asteroids);
 
     //bubble for resume information
     const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
@@ -219,12 +203,20 @@ const ThreeScene: React.FC = () => {
     const education = CreateText("Education\n    Skills", 0x0ff0ff, .1, .8, .5, .65);
     const projects = CreateText("Projects", 0xffd700, .1, .5, .7, -.5);
 
+    //lines
+    const yellowLine = CreateLine(0xffd700, -.75, .65, .25);
+    const tealLine = CreateLine(0x0ff0ff, .5, .7, -.5);
+    const pinkLine = CreateLine(0xdb4a8f, .8, .5, .65);
+
     scene.add(pinkBubble);
     scene.add(education);
     scene.add(yellowBubble);
     scene.add(experience);
     scene.add(tealBubble);
     scene.add(projects);
+    scene.add(yellowLine);
+    scene.add(tealLine);
+    scene.add(pinkLine);
     
     const clock = new THREE.Clock();
     const animate = () => {
@@ -243,23 +235,165 @@ const ThreeScene: React.FC = () => {
 
 
       // float bubbles
-      Float(elapsedTime, nameMesh, pinkBubble, education, yellowBubble, experience, tealBubble, projects);
-
-      asteroids.rotateY(.0015);
+      Float(elapsedTime, nameMesh, pinkBubble, education, yellowBubble, experience, tealBubble, projects, yellowLine, pinkLine, tealLine);
       
       composer.render();
       controls.update();
     };
 
+    //animation for scene
     animate();
     stats.end()
+
+    //cleanup initial
     return () => {
         (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
         window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('click', onMouseClick);
         mountRef.current?.removeChild(renderer.domElement);
       }
-  });
+  }, []);
+  // end of first useeffect
+
+  // create a panel to display information of respected bubble
+  const createInfoPanel = () => {
+    // make plane
+    const geometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.9,
+      
+      side: THREE.DoubleSide,
+    });
+    // return plane and set it
+    const panel = new THREE.Mesh(geometry, material);
+    panel.position.set(0, 0, 2);
+    panel.name = 'infoPanel';
+    panel.visible = false;
+    return panel;
+  };
+
+  const handleBubbleClick = (bubbleName: string) => {
+    if(!sceneRef.current || !cameraRef.current) return;
+
+    const infoPanel = sceneRef.current.getObjectByName('infoPanel') as THREE.Mesh;
+    const existingContent = sceneRef.current?.getObjectByName('panelContent');
+    const camera = cameraRef.current;
+
+    console.log("info", infoPanel);
+    if (!infoPanel) return;
+
+    if (activeSection === bubbleName) {
+      // Hide panel if clicking the same bubble
+      infoPanel.visible = false;
+      if (existingContent) sceneRef.current?.remove(existingContent);
+      setActiveSection(null);
+    } else {
+      // Show panel with new content
+      infoPanel.visible = true;
+      updateInfoPanelContent(bubbleName);
+      setActiveSection(bubbleName);
+      const distanceFromPanel = .75; // Set how far the camera should be from the panel
+
+      // Assuming the panel is at some fixed position, you can place the camera directly in front of it.
+      const panelPosition = infoPanel.position;
+      const panelNormal = new THREE.Vector3(0, 0, 1); // Assume the panel is facing the Z-axis direction
+      const cameraPosition = panelPosition.clone().add(panelNormal.multiplyScalar(distanceFromPanel));
+  
+      // Move the camera to the calculated position
+      camera.position.copy(cameraPosition);
+  
+      // Make the camera look at the center of the info panel
+      camera.lookAt(panelPosition);
+  
+      // If using OrbitControls, update the controls
+      //controlsRef.current?.update(); // Assuming you have OrbitControls
+    }
+  };
+
+  const updateInfoPanelContent = (section: string) => {
+
+    //description of section
+    const sectionDetails = getSectionDetails(section);
+    const lines = sectionDetails.split("\n");
+
+    //remove existing content
+    const existingContent = sceneRef.current?.getObjectByName('panelContent');
+    if (existingContent) sceneRef.current?.remove(existingContent);
+
+    // Create new content
+    const content = new THREE.Group();
+    content.name = 'panelContent';
+
+    // Add text for the section
+    const text = CreateText(section, 0xffffff, 0.1, 0, 0.6, 2);
+    content.add(text);
+
+    // Add more details based on the section
+    const textMesh = CreateText(sectionDetails, 0xffffff, 0.05, 0, .4, 2);
+    content.add(textMesh);
+    
+
+    sceneRef.current?.add(content);
+  };
+
+  const getSectionDetails = (section: string): string => {
+    switch (section) {
+      case 'experience':
+        return 'Your work experience details...';
+      case 'education':
+        return 'Bachelor of Applied Science - Applied Computing\n Minor - Business Administration';
+      case 'projects':
+        return 'Your projects details...';
+      default:
+        return '';
+    }
+  };
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (!sceneRef.current || !cameraRef.current) return;
+
+      const mouse = new THREE.Vector2();
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, cameraRef.current);
+
+      const intersects = raycaster.intersectObjects(bubblesRef.current);
+      if (intersects.length > 0) {
+        handleBubbleClick(intersects[0].object.name);
+        console.log(intersects[0].object.name);
+      }
+    };
+
+    const handleScroll = (event: WheelEvent) => {
+      event.preventDefault();
+
+      if (!sceneRef.current || !cameraRef.current) return;
+  
+      // Adjust scrollIndex based on deltaY
+      if (event.deltaY > 0) {
+        // Scroll down
+        scrollIndexRef.current = Math.min(scrollIndexRef.current + 1, bubblesRef.current.length - 1);
+      } else {
+        // Scroll up
+        scrollIndexRef.current = Math.max(scrollIndexRef.current - 1, 0);
+      }
+  
+      const bubble = bubblesRef.current[scrollIndexRef.current];
+      handleBubbleClick(bubble.name);
+    }
+
+    window.addEventListener('click', handleClick);
+    //window.addEventListener('wheel', handleScroll);
+
+    return () => {
+      window.removeEventListener('click', handleClick);
+    //  window.removeEventListener('wheel', handleScroll);
+    };
+  }, [activeSection]);
 
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };
