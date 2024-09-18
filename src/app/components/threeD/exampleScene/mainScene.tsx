@@ -6,13 +6,12 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import Name from '../name/name';
-import Instructions from '../instructions/instructions';
 import CreateBubble from '../bubbleCreation/createBubble';
 import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import CreateLine from '../lineCreation/createLine';
+import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -41,14 +40,10 @@ const ThreeScene: React.FC = () => {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const composerRef = useRef<EffectComposer | null>(null);
   const bubblesRef = useRef<THREE.Mesh[]>([]);
-  const scrollIndexRef = useRef<number>(0);
 
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const loader = new GLTFLoader();
-
-  const mouse = new THREE.Vector2();
-  const rayCaster = new THREE.Raycaster();
 
   const params = {
     bloomStrength: 2,
@@ -167,8 +162,8 @@ const ThreeScene: React.FC = () => {
             }
         });
         
-        camera.position.set(-0.197375, 2.1954194, 7.199677);
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.position.set(0, .25, 2);
+        camera.lookAt(new THREE.Vector3(0, .5, 0));
 
         controls.update();
 
@@ -176,37 +171,55 @@ const ThreeScene: React.FC = () => {
         console.error(error);
     });
 
+    const handleHover = (bubbleObject: any) => {
+      if (bubbleObject.material instanceof THREE.MeshPhysicalMaterial) {
+        bubbleObject.material.emissiveIntensity = .4;
+        //bubbleObject.material.color.setHex(0xffffff);
+        //console.log("Emissive Intensity Set To:", bubbleObject.material.emissiveIntensity);
+        //console.log(bubbleObject.material);
+      }
+    }
+
     // mouse event listeneer
     const onMouseMove = (event: MouseEvent) => {
+      if (!sceneRef.current || !cameraRef.current) return;
+
+      const mouse = new THREE.Vector2();
         // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;    
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; 
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, cameraRef.current);
+
+      const intersects = raycaster.intersectObjects(bubblesRef.current);
+      if (intersects.length > 0) {
+        handleHover(intersects[0].object);
+      }
     };
 
-    window.addEventListener('mousemove', onMouseMove, false);
-
-    //add name 
-    const nameMesh = Name();
-    scene.add(nameMesh);
+    window.addEventListener('mousemove', onMouseMove);
 
     //bubble for resume information
-    const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
+    const yellowBubble = CreateBubble(0xffd700, -.75, .8, .25);
     yellowBubble.name = "experience";
-    const tealBubble = CreateBubble(0x0ff0ff, .5, .7, -.5);
+    const tealBubble = CreateBubble(0x0ff0ff, .5, .9, -.5);
     tealBubble.name = "projects";
-    const pinkBubble = CreateBubble(0xdb4a8f, .8, .5, .65);
+    const pinkBubble = CreateBubble(0xFF7F7F, .8, .7, .65);
     pinkBubble.name = "education";
-    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble);
+    const purpleBubble = CreateBubble(0xDAB6FF, 0, .8, .8);
+    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
 
     //text
-    const experience = CreateText("Experience", 0xdb4a8f, .1, -.75, .65, .25);
-    const education = CreateText("Education\n    Skills", 0x0ff0ff, .1, .8, .5, .65);
-    const projects = CreateText("Projects", 0xffd700, .1, .5, .7, -.5);
-
+    const experience = CreateText("Experience", 0x000000, .1, -.75, .55, .3);
+    const education = CreateText("Education\n    Skills", 0x000000, .1, .8, .4, .7);
+    const projects = CreateText("Projects", 0x000000, .1, .5, .6, -.45);
+    const about = CreateText("About Me", 0x000000, .1, 0, .55, .85);
     //lines
-    const yellowLine = CreateLine(0xffd700, -.75, .65, .25);
-    const tealLine = CreateLine(0x0ff0ff, .5, .7, -.5);
-    const pinkLine = CreateLine(0xdb4a8f, .8, .5, .65);
+    const yellowLine = CreateLine(0xffd700, -.75, .6, .25);
+    const tealLine = CreateLine(0x0ff0ff, .5, .65, -.5);
+    const pinkLine = CreateLine(0xFF7F7F, .8, .45, .65);
+    const purpleLine = CreateLine(0xDAB6FF, 0, .6, .8);
 
     scene.add(pinkBubble);
     scene.add(education);
@@ -214,29 +227,22 @@ const ThreeScene: React.FC = () => {
     scene.add(experience);
     scene.add(tealBubble);
     scene.add(projects);
+    scene.add(purpleBubble);
+    scene.add(about);
     scene.add(yellowLine);
     scene.add(tealLine);
     scene.add(pinkLine);
-    
+    scene.add(purpleLine);
+
     const clock = new THREE.Clock();
+
+
     const animate = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      rayCaster.setFromCamera(mouse, camera);
-
-      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
-      bubblesRef.current.forEach(bubble => bubble.scale.set(1, 1, 1));
-
-      if (intersectBounds.length > 0){
-        const hoveredBubble = intersectBounds[0].object as THREE.Mesh;
-        hoveredBubble.scale.set(1.1, 1.1, 1.1);
-      }
-
-
       // float bubbles
-      Float(elapsedTime, nameMesh, pinkBubble, education, yellowBubble, experience, tealBubble, projects, yellowLine, pinkLine, tealLine);
-      
+      Float(elapsedTime, purpleBubble, about, pinkBubble, education, yellowBubble, experience, tealBubble, projects, yellowLine, pinkLine, tealLine, purpleLine);
       composer.render();
       controls.update();
     };
@@ -274,43 +280,70 @@ const ThreeScene: React.FC = () => {
   };
 
   const handleBubbleClick = (bubbleName: string) => {
-    if(!sceneRef.current || !cameraRef.current) return;
-
+    if (!sceneRef.current || !cameraRef.current) return;
+  
     const infoPanel = sceneRef.current.getObjectByName('infoPanel') as THREE.Mesh;
     const existingContent = sceneRef.current?.getObjectByName('panelContent');
     const camera = cameraRef.current;
-
-    console.log("info", infoPanel);
+  
     if (!infoPanel) return;
-
+  
+    const animationDuration = 1000; // Duration in milliseconds
+    let startTime: number | null = null;
+    const startPosition = camera.position.clone();
+    const startRotation = camera.rotation.clone();
+  
     if (activeSection === bubbleName) {
-      // Hide panel if clicking the same bubble
+      // hide panel if clicking same bubble
       infoPanel.visible = false;
       if (existingContent) sceneRef.current?.remove(existingContent);
       setActiveSection(null);
+  
+      // Animate camera back to original position
+      const endPosition = new THREE.Vector3(0, 0, 2);
+      const endRotation = new THREE.Euler(0, 0, 0);
+  
+      const animate = (time: number) => {
+        if (!startTime) startTime = time;
+        const progress = Math.min((time - startTime) / animationDuration, 1);
+  
+        camera.position.lerpVectors(startPosition, endPosition, progress);
+        camera.rotation.x = startRotation.x + (endRotation.x - startRotation.x) * progress;
+        camera.rotation.y = startRotation.y + (endRotation.y - startRotation.y) * progress;
+        camera.rotation.z = startRotation.z + (endRotation.z - startRotation.z) * progress;
+  
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+  
+      requestAnimationFrame(animate);
     } else {
       // Show panel with new content
       infoPanel.visible = true;
       updateInfoPanelContent(bubbleName);
       setActiveSection(bubbleName);
-      const distanceFromPanel = .75; // Set how far the camera should be from the panel
-
-      // Assuming the panel is at some fixed position, you can place the camera directly in front of it.
+      
+      const distanceFromPanel = 0.75;
       const panelPosition = infoPanel.position;
-      const panelNormal = new THREE.Vector3(0, 0, 1); // Assume the panel is facing the Z-axis direction
-      const cameraPosition = panelPosition.clone().add(panelNormal.multiplyScalar(distanceFromPanel));
+      const panelNormal = new THREE.Vector3(0, 0, 1);
+      const endPosition = panelPosition.clone().add(panelNormal.multiplyScalar(distanceFromPanel));
   
-      // Move the camera to the calculated position
-      camera.position.copy(cameraPosition);
+      const animate = (time: number) => {
+        if (!startTime) startTime = time;
+        const progress = Math.min((time - startTime) / animationDuration, 1);
   
-      // Make the camera look at the center of the info panel
-      camera.lookAt(panelPosition);
+        camera.position.lerpVectors(startPosition, endPosition, progress);
+        camera.lookAt(panelPosition);
   
-      // If using OrbitControls, update the controls
-      //controlsRef.current?.update(); // Assuming you have OrbitControls
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+  
+      requestAnimationFrame(animate);
     }
   };
-
   const updateInfoPanelContent = (section: string) => {
 
     //description of section
@@ -364,34 +397,13 @@ const ThreeScene: React.FC = () => {
       const intersects = raycaster.intersectObjects(bubblesRef.current);
       if (intersects.length > 0) {
         handleBubbleClick(intersects[0].object.name);
-        console.log(intersects[0].object.name);
       }
     };
 
-    const handleScroll = (event: WheelEvent) => {
-      event.preventDefault();
-
-      if (!sceneRef.current || !cameraRef.current) return;
-  
-      // Adjust scrollIndex based on deltaY
-      if (event.deltaY > 0) {
-        // Scroll down
-        scrollIndexRef.current = Math.min(scrollIndexRef.current + 1, bubblesRef.current.length - 1);
-      } else {
-        // Scroll up
-        scrollIndexRef.current = Math.max(scrollIndexRef.current - 1, 0);
-      }
-  
-      const bubble = bubblesRef.current[scrollIndexRef.current];
-      handleBubbleClick(bubble.name);
-    }
-
     window.addEventListener('click', handleClick);
-    //window.addEventListener('wheel', handleScroll);
 
     return () => {
       window.removeEventListener('click', handleClick);
-    //  window.removeEventListener('wheel', handleScroll);
     };
   }, [activeSection]);
 

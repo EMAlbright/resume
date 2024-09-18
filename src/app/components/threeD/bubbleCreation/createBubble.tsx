@@ -1,23 +1,39 @@
 import * as THREE from 'three';
-import { Group } from 'three/examples/jsm/libs/tween.module.js';
 
 const CreateBubble = (color: any, x: number, y:number, z:number) => {
-    const group = new THREE.Group();
-    const geometry = new THREE.SphereGeometry(.1, 32, 32);
 
-    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+    const vertices = new Float32Array([
+        // First triangle (A-B-C)
+        0, 0, 0,  
+        .4, 0, 0,  
+        .2, .2, 0,  
+    
+        // Second triangle (A-C-D)
+        0, 0, 0,  
+        .2, .2, 0,  
+        -.2, .2, 0 
+    ]);
+
+    //const geometry = new THREE.BufferGeometry();
+    //geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    //const geometry = new THREE.PlaneGeometry(0.4, 0.4);
+    
+    const geometry = new THREE.BoxGeometry(.2, .1, .1);
+
+    const parallelogramMaterial = new THREE.MeshPhysicalMaterial({
         color: color, 
         transparent: true, 
-        opacity: 0.2,
+        opacity: .2,
         emissive: color,
-        emissiveIntensity: .2, 
-        roughness: 0.1, 
-        metalness: 0,
+        emissiveIntensity: .1, 
+        side: THREE.DoubleSide
     });
+    geometry.computeVertexNormals();
 
-    const sphere = new THREE.Mesh(geometry, sphereMaterial);
-    sphere.position.set(x, y, z);  
-    return sphere;
+    const parallelogram = new THREE.Mesh(geometry, parallelogramMaterial);
+    parallelogram.position.set(x, y, z); 
+
+    return parallelogram;
 }
 
 export default CreateBubble;
