@@ -12,10 +12,10 @@ import { Float } from '../../animations/updateBubbles';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import CreateLine from '../lineCreation/createLine';
 import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
+import ExperiencePanel from '@/app/pages/experience/page';
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild( stats.dom );
 
 // create texture circle
 const createCircleTexture = () => {
@@ -46,7 +46,7 @@ const ThreeScene: React.FC = () => {
   const loader = new GLTFLoader();
 
   const params = {
-    bloomStrength: 2,
+    bloomStrength: 3,
     bloomThreshold: 0,
     bloomRadius: .25
   }
@@ -72,6 +72,12 @@ const ThreeScene: React.FC = () => {
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
+    //restrict orbit controls
+    // cant go below plane
+    //controls.enableZoom = false;
+    controls.maxDistance = 3;
+    controls.minDistance = 1;
+    controls.maxPolarAngle = Math.PI / 2; 
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
     composerRef.current = composer;
@@ -208,6 +214,7 @@ const ThreeScene: React.FC = () => {
     const pinkBubble = CreateBubble(0xFF7F7F, .8, .7, .65);
     pinkBubble.name = "education";
     const purpleBubble = CreateBubble(0xDAB6FF, 0, .8, .8);
+    purpleBubble.name = "about";
     bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
 
     //text
@@ -324,7 +331,7 @@ const ThreeScene: React.FC = () => {
       updateInfoPanelContent(bubbleName);
       setActiveSection(bubbleName);
       
-      const distanceFromPanel = 0.75;
+      const distanceFromPanel = 1;
       const panelPosition = infoPanel.position;
       const panelNormal = new THREE.Vector3(0, 0, 1);
       const endPosition = panelPosition.clone().add(panelNormal.multiplyScalar(distanceFromPanel));
@@ -348,7 +355,6 @@ const ThreeScene: React.FC = () => {
 
     //description of section
     const sectionDetails = getSectionDetails(section);
-    const lines = sectionDetails.split("\n");
 
     //remove existing content
     const existingContent = sceneRef.current?.getObjectByName('panelContent');
@@ -378,6 +384,8 @@ const ThreeScene: React.FC = () => {
         return 'Bachelor of Applied Science - Applied Computing\n Minor - Business Administration';
       case 'projects':
         return 'Your projects details...';
+      case 'about':
+        return 'Hey there! My name is Ethan Albright\n I am a 22 year old soon to be graduate look for opportunities in software development';
       default:
         return '';
     }
