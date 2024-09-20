@@ -14,6 +14,7 @@ import CreateLine from '../lineCreation/createLine';
 import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
 import ExperiencePanel from '@/app/pages/experience/page';
 import TWEEN from '@tweenjs/tween.js';
+import gsap from 'gsap'; 
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -167,15 +168,14 @@ const ThreeScene: React.FC = () => {
             }
         });
         
-        camera.position.set(0, .25, 2);
-        camera.lookAt(new THREE.Vector3(0, .5, 0));
-
+        camera.position.set(0, .5, 2);
         controls.update();
 
     }, undefined, function (error){
         console.error(error);
     });
 
+    camera.lookAt(new THREE.Vector3(0, .5, 0));
 
       //bubble for resume information
     const yellowBubble = CreateBubble(0xffd700, -.75, .8, .25);
@@ -240,9 +240,142 @@ const ThreeScene: React.FC = () => {
       }
     };
 
-    const handleClick = (bubbleObject: any) => {
-      camera.translateZ(2);
+    const createPanel = (section: string, x: number, y: number, z:number) => {
+      // make plane
+      const geometry = new THREE.PlaneGeometry(1.75, 1.5);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide,
+      });
+      // return plane and set it
+      const panel = new THREE.Mesh(geometry, material);
+      panel.position.set(0, 1, 1);
+
+      
+      let firstline = CreateText("Hello there!\n", 0xffffff, .25, 0, .5, 0.1);
+      let sectionDetails = CreateText("My name is Ethan Albright, a 22 year old software engineer based out of Seattle, Washington.\n", 0xffffff, .25, 0, .42, 0.1);
+      let information = CreateText("I am currently looking for positions in any realm of software development\n", 0xffffff, .25, 0, .25, 0.1);
+      let moreAbout = CreateText("Please feel free to reach out to me at EthanMacAlbright@gmail.com!\n", 0xffffff, .25, 0, .1, 0.1);
+      let contact = CreateText("Outside of coding, I enjoy working out, hanging out with my friends, gaming, and golfing.\n", 0xffffff, .25, 0, 0, 0.1);
+    
+      let bottom = CreateText("Click anywhere on this plane to return back to the main scene.", 0xffffff, .25, 0, -.5, 0.1);
+      
+      const aboutMe = [
+        firstline, sectionDetails, information, moreAbout, contact, bottom
+      ]
+
+      aboutMe.forEach(textPiece => (panel.add(textPiece)));
+
+      scene.add(panel);
+
+      const onPanelClick = () => {
+        // Remove the panel from the scene
+        scene.remove(panel);
+    
+        // Re-enable camera controls
+        controls.enableZoom = true;
+        controls.enableRotate = true;
+
+        // get the initial position of when the panel was clicked and
+        // go back to that position focused around the center
+        const xPos = x;
+        const yPos = y;
+        const zPos = z;
+
+        // back to camera position
+        gsap.to( camera.position, {
+          duration: 3,
+          y: yPos,
+          z: zPos,
+          x: xPos,
+          ease: "power3.inOut",
+          });
+        
+        // Animate OrbitControls target
+        // set the center or look at back to the center of model
+        gsap.to(controls.target, {
+          duration: 3,
+          x: 0,
+          y: .25,
+          z: 0,
+          ease: "power3.inOut",
+          onUpdate: () => {
+            //update new controls
+           camera.lookAt(controls.target);
+           controls.update();
+          }
+        });
+    
+        // Remove this listener after it has been used
+        window.removeEventListener('click', handlePanelClick);
+      };
+    
+      const handlePanelClick = (event: MouseEvent) => {
+        const mouse = new THREE.Vector2();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+    
+        const intersects = raycaster.intersectObject(panel);
+    
+        if (intersects.length > 0) {
+          onPanelClick();
+        }
+      };
+    
+      // to detect panel clicks
+      window.addEventListener('click', handlePanelClick);
     }
+
+    const onFirstBubbleClick = (bubbleObject: string)=> {
+      // on first click of a section
+      const initialX = camera.position.x;
+      const initialY = camera.position.y;
+      const initialZ = camera.position.z;
+      // rotate to the position and generate according bubble
+      if(bubbleObject === "about"){
+        createPanel(bubbleObject, initialX, initialY, initialZ);
+      }
+
+      // disable controls when viewing the panel
+      // once the panel is clicked , go back to the original position
+      // re enable controls and remove the panel
+      // move camera to new position
+      gsap.to(camera.position, {
+        duration: 3,
+        y: 0,
+        z: 2,
+        x: 0,
+        ease: "power3.inOut",
+      });
+
+      // set the new look at to the panel position
+      gsap.to(controls.target, {
+        duration: 3,
+        x: 0,
+        y: 1,
+        z: 0,
+        ease: "power3.inOut",
+        onUpdate: () => {
+          camera.lookAt(controls.target);
+          controls.update();
+        },
+        onComplete: () =>{
+          //disable movement
+          //@EMAlbright switch back to false after plane test
+          controls.enableZoom = false;
+          controls.enableRotate = false;
+        }
+      });
+    };
+
+    const handleClick = (bubbleObject: string) => {
+      onFirstBubbleClick(bubbleObject);
+    };
 
     const onClick = (event: MouseEvent) => {
       if (!sceneRef.current || !cameraRef.current) return;
