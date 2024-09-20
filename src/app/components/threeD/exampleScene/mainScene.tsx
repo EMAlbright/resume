@@ -41,7 +41,7 @@ const ThreeScene: React.FC = () => {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const composerRef = useRef<EffectComposer | null>(null);
-  const bubblesRef = useRef<THREE.Mesh[]>([]);
+  const bubblesRef = useRef<THREE.Group[]>([]);
 
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -178,49 +178,49 @@ const ThreeScene: React.FC = () => {
     camera.lookAt(new THREE.Vector3(0, .5, 0));
 
       //bubble for resume information
-    const yellowBubble = CreateBubble(0xffd700, -.75, .8, .25);
+    const yellowBubble = CreateBubble(0xA4D7E1, -.85, .7, .25, "Background");
     yellowBubble.name = "experience";
-    const tealBubble = CreateBubble(0x0ff0ff, .5, .9, -.5);
+    const tealBubble = CreateBubble(0xA4D7E1, .4, .9, -.5, "Education");
     tealBubble.name = "projects";
-    const pinkBubble = CreateBubble(0xFF7F7F, .8, .7, .65);
+    const pinkBubble = CreateBubble(0xA4D7E1, .7, .7, .65, "Projects  ");
     pinkBubble.name = "education";
-    const purpleBubble = CreateBubble(0xDAB6FF, 0, .8, .8);
+    const purpleBubble = CreateBubble(0xA4D7E1, -.1, .8, .8, "About Me");
     purpleBubble.name = "about";
-    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
-    
-        //text
-    const experience = CreateText("Experience", 0x000000, .1, -.75, .55, .3);
-    const education = CreateText("Education\n    Skills", 0x000000, .1, .8, .4, .7);
-    const projects = CreateText("Projects", 0x000000, .1, .5, .6, -.45);
-    const about = CreateText("About Me", 0x000000, .1, 0, .55, .85);
-        //lines
-    const yellowLine = CreateLine(0xffd700, -.75, .6, .25);
-    const tealLine = CreateLine(0x0ff0ff, .5, .65, -.5);
-    const pinkLine = CreateLine(0xFF7F7F, .8, .45, .65);
-    const purpleLine = CreateLine(0xDAB6FF, 0, .6, .8);
-    
-    scene.add(pinkBubble);
-    scene.add(education);
+    //bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
     scene.add(yellowBubble);
-    scene.add(experience);
+    scene.add(pinkBubble);
     scene.add(tealBubble);
-    scene.add(projects);
     scene.add(purpleBubble);
-    scene.add(about);
-    scene.add(yellowLine);
-    scene.add(tealLine);
-    scene.add(pinkLine);
-    scene.add(purpleLine);
 
+    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
 
-    const handleHover = (bubbleObject: any) => {
-      if (bubbleObject.material instanceof THREE.MeshPhysicalMaterial) {
-        bubbleObject.material.emissiveIntensity = .4;
-        //bubbleObject.material.color.setHex(0xffffff);
-        //console.log("Emissive Intensity Set To:", bubbleObject.material.emissiveIntensity);
-        //console.log(bubbleObject.material);
-      }
-    }
+    const screenGeometry = new THREE.PlaneGeometry(2, 1);
+    const screenMaterial = new THREE.MeshBasicMaterial({ color: 0xA4D7E1, side: THREE.DoubleSide, transparent:true, opacity:.1 });
+    const screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
+    screenMesh.position.set(camera.position.x, camera.position.y, camera.position.z-.1); 
+    screenMesh.visible = false; 
+    scene.add(screenMesh);
+
+    const updateBubbleRotation = () => {
+      if (!cameraRef.current) return;
+    
+      [yellowBubble, tealBubble, pinkBubble, purpleBubble].forEach((bubbleGroup) => {
+        const cameraPosition = cameraRef.current!.position.clone();
+        
+        // Calculate the direction from the bubble to the camera
+        const direction = new THREE.Vector3().subVectors(cameraPosition, bubbleGroup.position);
+        
+        // Project the direction onto the XZ plane
+        direction.y = 0;
+        direction.normalize();
+    
+        // Calculate the angle between the direction and the negative Z-axis
+        const angle = Math.atan2(direction.x, direction.z);
+    
+        // Apply rotation to the entire bubble group
+        bubbleGroup.rotation.y = angle;
+      });
+    };
 
     // mouse event listeneer
     const onMouseMove = (event: MouseEvent) => {
@@ -236,145 +236,7 @@ const ThreeScene: React.FC = () => {
 
       const intersects = raycaster.intersectObjects(bubblesRef.current);
       if (intersects.length > 0) {
-        handleHover(intersects[0].object);
       }
-    };
-
-    const createPanel = (section: string, x: number, y: number, z:number) => {
-      // make plane
-      const geometry = new THREE.PlaneGeometry(1.75, 1.5);
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.9,
-        side: THREE.DoubleSide,
-      });
-      // return plane and set it
-      const panel = new THREE.Mesh(geometry, material);
-      panel.position.set(0, 1, 1);
-
-      
-      let firstline = CreateText("Hello there!\n", 0xffffff, .25, 0, .5, 0.1);
-      let sectionDetails = CreateText("My name is Ethan Albright, a 22 year old software engineer based out of Seattle, Washington.\n", 0xffffff, .25, 0, .42, 0.1);
-      let information = CreateText("I am currently looking for positions in any realm of software development\n", 0xffffff, .25, 0, .25, 0.1);
-      let moreAbout = CreateText("Please feel free to reach out to me at EthanMacAlbright@gmail.com!\n", 0xffffff, .25, 0, .1, 0.1);
-      let contact = CreateText("Outside of coding, I enjoy working out, hanging out with my friends, gaming, and golfing.\n", 0xffffff, .25, 0, 0, 0.1);
-    
-      let bottom = CreateText("Click anywhere on this plane to return back to the main scene.", 0xffffff, .25, 0, -.5, 0.1);
-      
-      const aboutMe = [
-        firstline, sectionDetails, information, moreAbout, contact, bottom
-      ]
-
-      aboutMe.forEach(textPiece => (panel.add(textPiece)));
-
-      scene.add(panel);
-
-      const onPanelClick = () => {
-        // Remove the panel from the scene
-        scene.remove(panel);
-    
-        // Re-enable camera controls
-        controls.enableZoom = true;
-        controls.enableRotate = true;
-
-        // get the initial position of when the panel was clicked and
-        // go back to that position focused around the center
-        const xPos = x;
-        const yPos = y;
-        const zPos = z;
-
-        // back to camera position
-        gsap.to( camera.position, {
-          duration: 3,
-          y: yPos,
-          z: zPos,
-          x: xPos,
-          ease: "power3.inOut",
-          });
-        
-        // Animate OrbitControls target
-        // set the center or look at back to the center of model
-        gsap.to(controls.target, {
-          duration: 3,
-          x: 0,
-          y: .25,
-          z: 0,
-          ease: "power3.inOut",
-          onUpdate: () => {
-            //update new controls
-           camera.lookAt(controls.target);
-           controls.update();
-          }
-        });
-    
-        // Remove this listener after it has been used
-        window.removeEventListener('click', handlePanelClick);
-      };
-    
-      const handlePanelClick = (event: MouseEvent) => {
-        const mouse = new THREE.Vector2();
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(mouse, camera);
-    
-        const intersects = raycaster.intersectObject(panel);
-    
-        if (intersects.length > 0) {
-          onPanelClick();
-        }
-      };
-    
-      // to detect panel clicks
-      window.addEventListener('click', handlePanelClick);
-    }
-
-    const onFirstBubbleClick = (bubbleObject: string)=> {
-      // on first click of a section
-      const initialX = camera.position.x;
-      const initialY = camera.position.y;
-      const initialZ = camera.position.z;
-      // rotate to the position and generate according bubble
-      if(bubbleObject === "about"){
-        createPanel(bubbleObject, initialX, initialY, initialZ);
-      }
-
-      // disable controls when viewing the panel
-      // once the panel is clicked , go back to the original position
-      // re enable controls and remove the panel
-      // move camera to new position
-      gsap.to(camera.position, {
-        duration: 3,
-        y: 0,
-        z: 2,
-        x: 0,
-        ease: "power3.inOut",
-      });
-
-      // set the new look at to the panel position
-      gsap.to(controls.target, {
-        duration: 3,
-        x: 0,
-        y: 1,
-        z: 0,
-        ease: "power3.inOut",
-        onUpdate: () => {
-          camera.lookAt(controls.target);
-          controls.update();
-        },
-        onComplete: () =>{
-          //disable movement
-          //@EMAlbright switch back to false after plane test
-          controls.enableZoom = false;
-          controls.enableRotate = false;
-        }
-      });
-    };
-
-    const handleClick = (bubbleObject: string) => {
-      onFirstBubbleClick(bubbleObject);
     };
 
     const onClick = (event: MouseEvent) => {
@@ -388,9 +250,22 @@ const ThreeScene: React.FC = () => {
       raycaster.setFromCamera(mouse, cameraRef.current);
 
       const intersects = raycaster.intersectObjects(bubblesRef.current);
+      console.log(bubblesRef.current);
       if (intersects.length > 0){
-        handleClick(intersects[0].object.name);
+          console.log(intersects[0].object.name);
+          slideInScreen();
       }
+    };
+
+    const slideInScreen = () => {
+      screenMesh.visible = true;
+      screenMesh.scale.x = 0;
+
+      gsap.to(screenMesh.scale, {
+        x: 1, 
+        duration: 1,
+        ease: "power2.inOut"
+    });
     };
 
     window.addEventListener('click', onClick);
@@ -401,8 +276,10 @@ const ThreeScene: React.FC = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
+      updateBubbleRotation();
+
       // float bubbles
-      Float(elapsedTime, purpleBubble, about, pinkBubble, education, yellowBubble, experience, tealBubble, projects, yellowLine, pinkLine, tealLine, purpleLine);
+      Float(elapsedTime, purpleBubble, pinkBubble, yellowBubble,tealBubble);
       composer.render();
       controls.update();
     };
