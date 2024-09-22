@@ -42,6 +42,7 @@ const ThreeScene: React.FC = () => {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const composerRef = useRef<EffectComposer | null>(null);
   const bubblesRef = useRef<THREE.Group[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -52,6 +53,36 @@ const ThreeScene: React.FC = () => {
     bloomThreshold: 0,
     bloomRadius: .25
   }
+
+  const slideOpenScreen = () => {
+    if (!sceneRef.current) return;
+    const screenMesh = sceneRef.current.getObjectByName('screenMesh');
+    if (screenMesh instanceof THREE.Mesh) {
+      screenMesh.visible = true;
+      screenMesh.scale.y = 0;
+      gsap.to(screenMesh.scale, {
+        y: 1, 
+        duration: .25,
+        ease: "power2.inOut"
+      });
+    }
+  };
+  
+  const slideCloseScreen = () => {
+    if (!sceneRef.current) return;
+    const screenMesh = sceneRef.current.getObjectByName('screenMesh');
+    if (screenMesh instanceof THREE.Mesh) {
+      gsap.to(screenMesh.scale, {
+        y: 0, 
+        duration: .25,
+        ease: "power2.inOut",
+        onComplete: () => {
+          screenMesh.visible = false;
+        }
+      });
+    }
+  };
+  
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -181,9 +212,9 @@ const ThreeScene: React.FC = () => {
     const yellowBubble = CreateBubble(0xA4D7E1, -.85, .7, .25, "Background");
     yellowBubble.name = "experience";
     const tealBubble = CreateBubble(0xA4D7E1, .4, .9, -.5, "Education");
-    tealBubble.name = "projects";
+    tealBubble.name = "education";
     const pinkBubble = CreateBubble(0xA4D7E1, .7, .7, .65, "Projects  ");
-    pinkBubble.name = "education";
+    pinkBubble.name = "projects";
     const purpleBubble = CreateBubble(0xA4D7E1, -.1, .8, .8, "About Me");
     purpleBubble.name = "about";
     //bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
@@ -194,10 +225,13 @@ const ThreeScene: React.FC = () => {
 
     bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
 
-    const screenGeometry = new THREE.PlaneGeometry(2, 1);
-    const screenMaterial = new THREE.MeshBasicMaterial({ color: 0xA4D7E1, side: THREE.DoubleSide, transparent:true, opacity:.1 });
+    const screenGeometry = new THREE.PlaneGeometry(1, .5);
+    const screenMaterial = new THREE.MeshBasicMaterial({ color: 0xE6F7FA, side: THREE.DoubleSide, transparent:true, opacity:0.075 });
     const screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
-    screenMesh.position.set(camera.position.x, camera.position.y, camera.position.z-.1); 
+    // set the name so it cant be referenced to close and open functions
+    screenMesh.name = 'screenMesh';
+    
+    screenMesh.position.set(camera.position.x-.5, camera.position.y+.5, camera.position.z+.5); 
     screenMesh.visible = false; 
     scene.add(screenMesh);
 
@@ -241,31 +275,42 @@ const ThreeScene: React.FC = () => {
 
     const onClick = (event: MouseEvent) => {
       if (!sceneRef.current || !cameraRef.current) return;
-
+    
       const mouse = new THREE.Vector2();
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(mouse, cameraRef.current);
-
-      const intersects = raycaster.intersectObjects(bubblesRef.current);
-      console.log(bubblesRef.current);
-      if (intersects.length > 0){
-          console.log(intersects[0].object.name);
-          slideInScreen();
+    
+      const intersects = raycaster.intersectObjects(bubblesRef.current, true);
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        if (intersectedObject instanceof THREE.Mesh) {
+        // Check if the intersected object is the parallelogram mesh
+        if (intersectedObject.name === "bubbleParallelogram" && 
+            intersectedObject.material instanceof THREE.MeshPhysicalMaterial) {
+          
+          const bubbleGroup = intersectedObject.parent;
+          if (bubbleGroup) {
+            console.log('Parallelogram clicked in bubble:', bubbleGroup.name);
+            
+            setIsOpen((prevIsOpen) => {
+              if (!prevIsOpen) {
+                slideOpenScreen();
+                console.log('Opening');
+                return true;
+              } else {
+                slideCloseScreen();
+                console.log('Closing');
+                return false;
+              }
+            });
+              setActiveSection(bubbleGroup.name);
+          }
+        }
       }
-    };
-
-    const slideInScreen = () => {
-      screenMesh.visible = true;
-      screenMesh.scale.x = 0;
-
-      gsap.to(screenMesh.scale, {
-        x: 1, 
-        duration: 1,
-        ease: "power2.inOut"
-    });
+    }
     };
 
     window.addEventListener('click', onClick);
@@ -295,6 +340,7 @@ const ThreeScene: React.FC = () => {
         mountRef.current?.removeChild(renderer.domElement);
       }
   }, []);
+  
 
   stats.end();
 

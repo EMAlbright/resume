@@ -4,21 +4,20 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 const CreateBubble = (color: any, x: number, y: number, z: number, text: string) => {
     // Create bubble geometry (parallelogram shape)
-    const vertices = new Float32Array([
-        // First triangle (A-B-C)
-        0, 0, 0,
-        0.4, 0, 0,
-        0.2, 0.2, 0,
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.lineTo(0.4, 0);
+    shape.lineTo(0.6, 0.2);
+    shape.lineTo(0.2, 0.2);
+    shape.lineTo(0, 0);
 
-        // Second triangle (A-C-D)
-        0, 0, 0,
-        0.2, 0.2, 0,
-        -0.2, 0.2, 0,
-    ]);
+    const extrudeSettings = {
+        steps: 1,
+        depth: 0.1,  // Adjust this value to increase or decrease depth
+        bevelEnabled: false
+    };
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    geometry.computeVertexNormals();
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
     // Create materials
     const parallelogramMaterial = new THREE.MeshPhysicalMaterial({
@@ -32,7 +31,8 @@ const CreateBubble = (color: any, x: number, y: number, z: number, text: string)
 
     // Create the parallelogram mesh
     const parallelogram = new THREE.Mesh(geometry, parallelogramMaterial);
-    parallelogram.position.x -= .15;
+    parallelogram.name = "bubbleParallelogram";
+    parallelogram.position.x -= .2;
     // Create a text mesh
     const fontLoader = new FontLoader();
     fontLoader.load('/fonts/OxaniumMedium_Regular.json', (font) => {
@@ -53,7 +53,8 @@ const CreateBubble = (color: any, x: number, y: number, z: number, text: string)
         textBox.getCenter(textCenter);
         textMesh.position.sub(textCenter); // Move to center
         textMesh.position.y += 0.1;
-        textMesh.position.x -= 0.05;
+        textMesh.position.z += 0.1;
+        textMesh.position.x += 0.1;
         // Add text mesh to the group
         bubbleGroup.add(textMesh);
     });
@@ -66,8 +67,8 @@ const CreateBubble = (color: any, x: number, y: number, z: number, text: string)
     const line = new THREE.Line(lineGeometry, lineMaterial);
     // Create a group to hold the parallelogram, text, and line
     const bubbleGroup = new THREE.Group();
-    bubbleGroup.add(parallelogram);
     bubbleGroup.add(line);
+    bubbleGroup.add(parallelogram);
     bubbleGroup.position.set(x, y, z);
 
     return bubbleGroup;
