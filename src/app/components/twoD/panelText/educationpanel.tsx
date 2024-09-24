@@ -41,15 +41,16 @@ export const CreateEducationText = () => {
     // University of Washington
     const university = document.createElement('div');
     university.style.marginBottom = '20px';
+    university.style.textAlign = 'center';
     const universityTitle = document.createElement('h3');
-    universityTitle.textContent = 'University of Washington';
+    universityTitle.innerHTML = `<span style="font-weight: bold;"> University of Washington </span>`;
     universityTitle.style.margin = '0';
     universityTitle.style.fontSize = '22px';
     universityTitle.style.color = '#333';
 
     const universityDetails = document.createElement('p');
     universityDetails.innerHTML = `
-        <strong>Years:</strong> 2020 - 2024<br>
+        <strong>Years:</strong> 2020 - 2024 (currently enrolled)<br>
         <strong>Major:</strong> Applied Computing<br>
         <strong>Minor:</strong> Data Science & Business Administration
     `;
@@ -63,8 +64,9 @@ export const CreateEducationText = () => {
     // Woodinville High School
     const highSchool = document.createElement('div');
     highSchool.style.marginBottom = '20px';
+    highSchool.style.textAlign = 'center';
     const highSchoolTitle = document.createElement('h3');
-    highSchoolTitle.textContent = 'Woodinville High School';
+    highSchoolTitle.innerHTML = `<span style="font-weight: bold;"> Woodinville High School </span>`;
     highSchoolTitle.style.margin = '0';
     highSchoolTitle.style.fontSize = '22px';
     highSchoolTitle.style.color = '#333';
