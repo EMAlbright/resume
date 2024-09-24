@@ -6,12 +6,23 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import Name from '../name/name';
-import Instructions from '../instructions/instructions';
-import CreateBubble from '../bubbleCreation/createBubble';
-import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
-import { useRouter } from 'next/navigation';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+import CreateLine from '../lineCreation/createLine';
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+import TWEEN from '@tweenjs/tween.js';
+import gsap from 'gsap'; 
+import { CreateButton } from '../../twoD/buttonCreation/createButton';
+import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
+import { CreateDescriptionPanel } from '../../twoD/panelCreation/createPanel';
+import { slideOpenScreen } from '../../animations/slideOpenSection';
+import { CreateEducationText } from '../../twoD/panelText/educationpanel';
+import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
+import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
+import { CreateProjectText } from '../../twoD/panelText/projectpanel';
+
+var stats = new Stats();
+stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 
 // create texture circle
 const createCircleTexture = () => {
@@ -30,18 +41,21 @@ const createCircleTexture = () => {
   }
 
 const ThreeScene: React.FC = () => {
+  stats.begin()
   const mountRef = useRef<HTMLDivElement>(null);
-  const bubblesRef = useRef<THREE.Mesh[]>([]);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const composerRef = useRef<EffectComposer | null>(null);
+  const bubblesRef = useRef<THREE.Group[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+
   const loader = new GLTFLoader();
-
-  const mouse = new THREE.Vector2();
-  const rayCaster = new THREE.Raycaster();
-
-  // route to experience, education ,projects pages
-  const router = useRouter();
+  // css renderer
+  const css3dRendererRef = useRef<CSS3DRenderer | null>(null);
 
   const params = {
-    bloomStrength: 5,
+    bloomStrength: 3,
     bloomThreshold: 0,
     bloomRadius: .25
   }
@@ -51,23 +65,49 @@ const ThreeScene: React.FC = () => {
 
     //create scene, camera , renderer
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    cameraRef.current = camera;
     const renderer = new THREE.WebGLRenderer();
 
     // set size to window h/l
     renderer.setSize(window.innerWidth, window.innerHeight);
+
     mountRef.current.appendChild(renderer.domElement);
 
     // add light
     const ambientLight = new THREE.AmbientLight(0x404040); 
     scene.add(ambientLight);
 
+    // css 3d renderer setup
+    const css3dRenderer = new CSS3DRenderer();
+    css3dRenderer.setSize(window.innerWidth, window.innerHeight);
+    css3dRenderer.domElement.style.position = 'absolute';
+    css3dRenderer.domElement.style.top = '0';
+    css3dRenderer.domElement.style.pointerEvents = 'none';
+    mountRef.current.appendChild(css3dRenderer.domElement);
+    css3dRendererRef.current = css3dRenderer;
+
     const controls = new OrbitControls(camera, renderer.domElement);
+    // reduce camera quick movements
+    controls.enableDamping = true;  
+    controls.dampingFactor = 0.1;
+
+    //restrict orbit controls
+    // cant go below plane
+    //controls.enableZoom = false;
+    controls.maxDistance = 3;
+    controls.minDistance = 1;
+    controls.maxPolarAngle = Math.PI / 2; 
 
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
+    composerRef.current = composer;
+
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
+
+    // info panel for educaitno, experience, projects
 
     // add glow / star effect with UnrealBloomPass
     const bloomPass = new UnrealBloomPass(
@@ -148,108 +188,135 @@ const ThreeScene: React.FC = () => {
             }
         });
         
-        camera.position.set(-0.197375, 2.1954194, 7.199677);
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
-
+        camera.position.set(0, .5, 2);
         controls.update();
 
     }, undefined, function (error){
         console.error(error);
     });
 
-    // mouse event listeneer
-    const onMouseMove = (event: MouseEvent) => {
-        // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;    
-    };
+    // initial cameras scene setup
+    camera.lookAt(new THREE.Vector3(0, .5, 0));
 
-    // click event listener
-    const onMouseClick = (event: MouseEvent) => {
-      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
-      console.log("ref", bubblesRef.current);
-      if(intersectBounds.length > 0){
-        const intersectedBubble = intersectBounds[0].object;
-        let destination = '';
-        console.log("bubble clicked:", intersectedBubble);
-        if (intersectedBubble.name === bubblesRef.current[0].name) {
-          destination = '/pages/experience';
-      } else if (intersectedBubble.name === bubblesRef.current[1].name) {
-          destination = '/pages/projects';
-      } else if (intersectedBubble.name === bubblesRef.current[2].name) {
-          destination = '/pages/education';
-      }
+    // create 2d button with css renderer
+    const abouthtmlButton = CreateHTMLbutton("About Me");
+    const aboutButton = CreateButton(abouthtmlButton, -.1, .7, .8);
+    aboutButton.name = 'aboutSection';
+    scene.add(aboutButton);
 
-      router.push(destination);
-    };
-  }
+    const experiencehtmlButton = CreateHTMLbutton("Experience");
+    const experienceButton = CreateButton(experiencehtmlButton, -.85, .7, .25);
+    experienceButton.name = 'experienceSection';
+    scene.add(experienceButton);
 
+    const projectshtmlButton = CreateHTMLbutton("Projects");
+    const projectsButton = CreateButton(projectshtmlButton, .7, .7, .65);
+    projectsButton.name = 'projectSection';
+    scene.add(projectsButton);
 
-    window.addEventListener('mousemove', onMouseMove, false);
-    window.addEventListener('click', onMouseClick, false);
+    const educationhtmlButton = CreateHTMLbutton("Education");
+    const educationButton = CreateButton(educationhtmlButton, .4, .7, -.5);
+    educationButton.name = 'educationSection';
+    scene.add(educationButton);
 
-    //add name 
-    const nameMesh = Name();
-    scene.add(nameMesh);
+    const aboutText = CreateAboutText();
+    const aboutPanel = CreateDescriptionPanel(scene, aboutButton, aboutText, aboutButton.position.x, aboutButton.position.y-.1, aboutButton.position.z);
+    const experienceText = CreateExperienceText();
+    const experiencePanel = CreateDescriptionPanel(scene, experienceButton, experienceText, experienceButton.position.x, experienceButton.position.y-.1, experienceButton.position.z);
+    const projectext = CreateProjectText();
+    const projectPanel = CreateDescriptionPanel(scene, projectsButton, projectext, projectsButton.position.x, projectsButton.position.y-.1, projectsButton.position.z);
+    const educationText = CreateEducationText();
+    const educationPanel = CreateDescriptionPanel(scene, educationButton, educationText, educationButton.position.x, educationButton.position.y-.1, educationButton.position.z);
 
-    //add asteroids for instructions
-    const asteroids = Instructions();
-    scene.add(asteroids);
-
-    //bubble for resume information
-    const yellowBubble = CreateBubble(0xffd700, -.75, .65, .25);
-    yellowBubble.name = "experience";
-    const tealBubble = CreateBubble(0x0ff0ff, .5, .7, -.5);
-    tealBubble.name = "projects";
-    const pinkBubble = CreateBubble(0xdb4a8f, .8, .5, .65);
-    pinkBubble.name = "education";
-    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble);
-
-    //text
-    const experience = CreateText("Experience", 0xdb4a8f, .1, -.75, .65, .25);
-    const education = CreateText("Education", 0x0ff0ff, .1, .8, .5, .65);
-    const projects = CreateText("Projects", 0xffd700, .1, .5, .7, -.5);
-
-    scene.add(pinkBubble);
-    scene.add(education);
-    scene.add(yellowBubble);
-    scene.add(experience);
-    scene.add(tealBubble);
-    scene.add(projects);
+    // set the name so it cant be referenced to close and open functions
+    aboutPanel.name = 'aboutPanel';
+    experiencePanel.name = 'experiencePanel';
+    projectPanel.name = 'projectPanel';
+    educationPanel.name = 'educationPanel';
     
+    aboutPanel.visible = false;
+    experiencePanel.visible = false;
+    projectPanel.visible = false;
+    educationPanel.visible = false; 
+
+    const updateSectionRotation = () => {
+      if (!cameraRef.current) return;
+    
+      [aboutButton, experienceButton, projectsButton, educationButton, aboutPanel, experiencePanel, projectPanel, educationPanel].forEach((bubbleGroup) => {
+        const cameraPosition = cameraRef.current!.position.clone();
+        
+        // Calculate the direction from the bubble to the camera
+        const direction = new THREE.Vector3().subVectors(cameraPosition, bubbleGroup.position);
+        
+        // Project the direction onto the XZ plane
+        direction.y = 0;
+        direction.normalize();
+    
+        // Calculate the angle between the direction and the negative Z-axis
+        const angle = Math.atan2(direction.x, direction.z);
+    
+        // Apply rotation to the entire bubble group
+        bubbleGroup.rotation.y = angle;
+      });
+    };
+
+    // event listener for button
+    abouthtmlButton.addEventListener('click', () => {
+      scene.add(aboutPanel);
+      if(!aboutPanel.visible){
+        slideOpenScreen(sceneRef, "aboutPanel", "aboutSection");
+      }
+    });
+
+    experiencehtmlButton.addEventListener('click', () => {
+      scene.add(experiencePanel);
+      if(!experiencePanel.visible){
+        slideOpenScreen(sceneRef, "experiencePanel", "experienceSection");
+      }
+    });
+
+    projectshtmlButton.addEventListener('click', () => {
+      scene.add(projectPanel);
+      if(!projectPanel.visible){
+        slideOpenScreen(sceneRef, "projectPanel", "projectSection");
+      }
+    });
+
+    educationhtmlButton.addEventListener('click', () => {
+      scene.add(educationPanel);
+      if(!educationPanel.visible){
+        slideOpenScreen(sceneRef, "educationPanel", "educationSection");
+      }
+    });
+
     const clock = new THREE.Clock();
+
     const animate = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      rayCaster.setFromCamera(mouse, camera);
-
-      const intersectBounds = rayCaster.intersectObjects(bubblesRef.current);
-      bubblesRef.current.forEach(bubble => bubble.scale.set(1, 1, 1));
-
-      if (intersectBounds.length > 0){
-        const hoveredBubble = intersectBounds[0].object as THREE.Mesh;
-        hoveredBubble.scale.set(1.1, 1.1, 1.1);
-      }
-
+      updateSectionRotation();
 
       // float bubbles
-      Float(elapsedTime, nameMesh, pinkBubble, education, yellowBubble, experience, tealBubble, projects);
-
-      asteroids.rotateY(.0015);
-      
+      Float(elapsedTime, aboutButton, projectsButton, experienceButton, educationButton);
       composer.render();
       controls.update();
+      css3dRenderer.render(scene, camera);
     };
 
+    //animation for scene
     animate();
 
+    //cleanup initial
     return () => {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('click', onMouseClick);
+        (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})();
         mountRef.current?.removeChild(renderer.domElement);
+        mountRef.current?.removeChild(css3dRenderer.domElement);
       }
-  });
+  }, []);
+  
+
+  stats.end();
 
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };
