@@ -1,35 +1,31 @@
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 import gsap from 'gsap'; 
 
-export const CreateDescriptionPanel = (scene: any, button: any, descriptionText: string, x: number, y: number, z: number) => {
+export const CreateDescriptionPanel = (scene: any, button: any, descriptionText: any, x: number, y: number, z: number) => {
     // Create panel container
     const panel = document.createElement('div');
-    panel.style.width = '400px';
-    panel.style.height = '300px';
-    panel.style.backgroundColor = '#FFFFFF';
-    panel.style.border = '5px solid #ccc';
+    panel.style.width = '750px';
+    panel.style.height = '500px';
+    panel.style.backgroundColor = '#A4D7E1';
+    panel.style.border = '5px solid #000';
     panel.style.borderRadius = '10px';
     panel.style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.1)';
-    panel.style.position = 'relative'; // Allow for positioning of X button
+    panel.style.position = 'relative'; 
     panel.style.padding = '20px';
     panel.style.fontSize = '20px';
     panel.style.color = '#333';
     panel.style.pointerEvents = 'auto';
-    panel.style.opacity = '0.95';
+    panel.style.opacity = '0.85';
 
-    // Create description text
-    const description = document.createElement('p');
-    description.textContent = descriptionText;
-    description.style.margin = '0';
-    description.style.fontFamily = 'Arial, sans-serif';
-    panel.appendChild(description);
+    panel.appendChild(descriptionText);
 
     // Create close (X) button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'X';
+    closeButton.style.width = '40px';
     closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.left = '10px';
+    closeButton.style.top = '0px';
+    closeButton.style.left = '0px';
     closeButton.style.background = 'transparent';
     closeButton.style.border = 'none';
     closeButton.style.fontSize = '24px';
@@ -43,7 +39,7 @@ export const CreateDescriptionPanel = (scene: any, button: any, descriptionText:
         closeButton.style.color = '#FFFFFF';
     };
     closeButton.onmouseleave = () => {
-        closeButton.style.backgroundColor = '#fff';
+        closeButton.style.backgroundColor = '#A4D7E1';
         closeButton.style.color = '#000';
     };
 
@@ -55,6 +51,8 @@ export const CreateDescriptionPanel = (scene: any, button: any, descriptionText:
             duration: .25,
             ease: "power2.inOut",
             onComplete: () => {
+                closeButton.style.backgroundColor = '#A4D7E1';
+                closeButton.style.color = '#000';
                 panelObject.visible = false;
                 scene.remove(panelObject);
                 button.visible = true;
@@ -67,7 +65,7 @@ export const CreateDescriptionPanel = (scene: any, button: any, descriptionText:
     // Create CSS3DObject for the panel
     const panelObject = new CSS3DObject(panel);
     panelObject.position.set(x, y, z);
-    panelObject.scale.set(0.001, 0.001, 0.001);  
+    panelObject.scale.set(0.00025, 0.00025, 0.00025);  
 
     return panelObject;
 }

@@ -16,6 +16,10 @@ import { CreateButton } from '../../twoD/buttonCreation/createButton';
 import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
 import { CreateDescriptionPanel } from '../../twoD/panelCreation/createPanel';
 import { slideOpenScreen } from '../../animations/slideOpenSection';
+import { CreateEducationText } from '../../twoD/panelText/educationpanel';
+import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
+import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
+import { CreateProjectText } from '../../twoD/panelText/projectpanel';
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -196,7 +200,7 @@ const ThreeScene: React.FC = () => {
 
     // create 2d button with css renderer
     const abouthtmlButton = CreateHTMLbutton("About Me");
-    const aboutButton = CreateButton(abouthtmlButton, -.1, .8, .8);
+    const aboutButton = CreateButton(abouthtmlButton, -.1, .7, .8);
     aboutButton.name = 'aboutSection';
     scene.add(aboutButton);
 
@@ -211,14 +215,18 @@ const ThreeScene: React.FC = () => {
     scene.add(projectsButton);
 
     const educationhtmlButton = CreateHTMLbutton("Education");
-    const educationButton = CreateButton(educationhtmlButton, .4, .9, -.5);
+    const educationButton = CreateButton(educationhtmlButton, .4, .7, -.5);
     educationButton.name = 'educationSection';
     scene.add(educationButton);
 
-    const aboutPanel = CreateDescriptionPanel(scene, aboutButton, "About me!", aboutButton.position.x, aboutButton.position.y-.1, aboutButton.position.z);
-    const experiencePanel = CreateDescriptionPanel(scene, experienceButton, "My Experience", experienceButton.position.x, experienceButton.position.y-.1, experienceButton.position.z);
-    const projectPanel = CreateDescriptionPanel(scene, projectsButton, "My Projects", projectsButton.position.x, projectsButton.position.y-.1, projectsButton.position.z);
-    const educationPanel = CreateDescriptionPanel(scene, educationButton, "My Education", educationButton.position.x, educationButton.position.y-.1, educationButton.position.z);
+    const aboutText = CreateAboutText();
+    const aboutPanel = CreateDescriptionPanel(scene, aboutButton, aboutText, aboutButton.position.x, aboutButton.position.y-.1, aboutButton.position.z);
+    const experienceText = CreateExperienceText();
+    const experiencePanel = CreateDescriptionPanel(scene, experienceButton, experienceText, experienceButton.position.x, experienceButton.position.y-.1, experienceButton.position.z);
+    const projectext = CreateProjectText();
+    const projectPanel = CreateDescriptionPanel(scene, projectsButton, projectext, projectsButton.position.x, projectsButton.position.y-.1, projectsButton.position.z);
+    const educationText = CreateEducationText();
+    const educationPanel = CreateDescriptionPanel(scene, educationButton, educationText, educationButton.position.x, educationButton.position.y-.1, educationButton.position.z);
 
     // set the name so it cant be referenced to close and open functions
     aboutPanel.name = 'aboutPanel';

@@ -5,12 +5,12 @@ export const CreateHTMLbutton = (text: string) => {
     button.style.height = '350px';
     button.style.padding = '10px';
     button.style.backgroundColor = '#A4D7E1';
-    button.style.color = 'white';
+    button.style.color = 'black';
     button.style.border = 'none';
     button.style.borderRadius = '5px';
     button.style.cursor = 'pointer';
     button.style.pointerEvents = 'auto';
-    button.style.opacity = '0.95';
+    button.style.opacity = '0.75';
     button.style.fontSize = '100px';
     button.style.clipPath = 'polygon(25% 0, 100% 0, 75% 100%, 0 100%)';
 
