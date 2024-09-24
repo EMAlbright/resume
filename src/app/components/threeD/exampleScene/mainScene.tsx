@@ -6,15 +6,16 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import CreateBubble from '../bubbleCreation/createBubble';
-import CreateText from '../createText/createText';
 import { Float } from '../../animations/updateBubbles';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import CreateLine from '../lineCreation/createLine';
-import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
-import ExperiencePanel from '@/app/pages/experience/page';
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
 import TWEEN from '@tweenjs/tween.js';
 import gsap from 'gsap'; 
+import { CreateButton } from '../../twoD/buttonCreation/createButton';
+import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
+import { CreateDescriptionPanel } from '../../twoD/panelCreation/createPanel';
+import { slideOpenScreen } from '../../animations/slideOpenSection';
 
 var stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -44,45 +45,16 @@ const ThreeScene: React.FC = () => {
   const bubblesRef = useRef<THREE.Group[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const loader = new GLTFLoader();
+  // css renderer
+  const css3dRendererRef = useRef<CSS3DRenderer | null>(null);
 
   const params = {
     bloomStrength: 3,
     bloomThreshold: 0,
     bloomRadius: .25
   }
-
-  const slideOpenScreen = () => {
-    if (!sceneRef.current) return;
-    const screenMesh = sceneRef.current.getObjectByName('screenMesh');
-    if (screenMesh instanceof THREE.Mesh) {
-      screenMesh.visible = true;
-      screenMesh.scale.y = 0;
-      gsap.to(screenMesh.scale, {
-        y: 1, 
-        duration: .25,
-        ease: "power2.inOut"
-      });
-    }
-  };
-  
-  const slideCloseScreen = () => {
-    if (!sceneRef.current) return;
-    const screenMesh = sceneRef.current.getObjectByName('screenMesh');
-    if (screenMesh instanceof THREE.Mesh) {
-      gsap.to(screenMesh.scale, {
-        y: 0, 
-        duration: .25,
-        ease: "power2.inOut",
-        onComplete: () => {
-          screenMesh.visible = false;
-        }
-      });
-    }
-  };
-  
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -103,7 +75,19 @@ const ThreeScene: React.FC = () => {
     const ambientLight = new THREE.AmbientLight(0x404040); 
     scene.add(ambientLight);
 
+    // css 3d renderer setup
+    const css3dRenderer = new CSS3DRenderer();
+    css3dRenderer.setSize(window.innerWidth, window.innerHeight);
+    css3dRenderer.domElement.style.position = 'absolute';
+    css3dRenderer.domElement.style.top = '0';
+    css3dRenderer.domElement.style.pointerEvents = 'none';
+    mountRef.current.appendChild(css3dRenderer.domElement);
+    css3dRendererRef.current = css3dRenderer;
+
     const controls = new OrbitControls(camera, renderer.domElement);
+    // reduce camera quick movements
+    controls.enableDamping = true;  
+    controls.dampingFactor = 0.1;
 
     //restrict orbit controls
     // cant go below plane
@@ -111,6 +95,7 @@ const ThreeScene: React.FC = () => {
     controls.maxDistance = 3;
     controls.minDistance = 1;
     controls.maxPolarAngle = Math.PI / 2; 
+
     // pass renderer to composer . scene and camera
     const composer = new EffectComposer(renderer);
     composerRef.current = composer;
@@ -206,39 +191,50 @@ const ThreeScene: React.FC = () => {
         console.error(error);
     });
 
+    // initial cameras scene setup
     camera.lookAt(new THREE.Vector3(0, .5, 0));
 
-      //bubble for resume information
-    const yellowBubble = CreateBubble(0xA4D7E1, -.85, .7, .25, "Background");
-    yellowBubble.name = "experience";
-    const tealBubble = CreateBubble(0xA4D7E1, .4, .9, -.5, "Education");
-    tealBubble.name = "education";
-    const pinkBubble = CreateBubble(0xA4D7E1, .7, .7, .65, "Projects  ");
-    pinkBubble.name = "projects";
-    const purpleBubble = CreateBubble(0xA4D7E1, -.1, .8, .8, "About Me");
-    purpleBubble.name = "about";
-    //bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
-    scene.add(yellowBubble);
-    scene.add(pinkBubble);
-    scene.add(tealBubble);
-    scene.add(purpleBubble);
+    // create 2d button with css renderer
+    const abouthtmlButton = CreateHTMLbutton("About Me");
+    const aboutButton = CreateButton(abouthtmlButton, -.1, .8, .8);
+    aboutButton.name = 'aboutSection';
+    scene.add(aboutButton);
 
-    bubblesRef.current.push(yellowBubble, tealBubble, pinkBubble, purpleBubble);
+    const experiencehtmlButton = CreateHTMLbutton("Experience");
+    const experienceButton = CreateButton(experiencehtmlButton, -.85, .7, .25);
+    experienceButton.name = 'experienceSection';
+    scene.add(experienceButton);
 
-    const screenGeometry = new THREE.PlaneGeometry(1, .5);
-    const screenMaterial = new THREE.MeshBasicMaterial({ color: 0xE6F7FA, side: THREE.DoubleSide, transparent:true, opacity:0.075 });
-    const screenMesh = new THREE.Mesh(screenGeometry, screenMaterial);
+    const projectshtmlButton = CreateHTMLbutton("Projects");
+    const projectsButton = CreateButton(projectshtmlButton, .7, .7, .65);
+    projectsButton.name = 'projectSection';
+    scene.add(projectsButton);
+
+    const educationhtmlButton = CreateHTMLbutton("Education");
+    const educationButton = CreateButton(educationhtmlButton, .4, .9, -.5);
+    educationButton.name = 'educationSection';
+    scene.add(educationButton);
+
+    const aboutPanel = CreateDescriptionPanel(scene, aboutButton, "About me!", aboutButton.position.x, aboutButton.position.y-.1, aboutButton.position.z);
+    const experiencePanel = CreateDescriptionPanel(scene, experienceButton, "My Experience", experienceButton.position.x, experienceButton.position.y-.1, experienceButton.position.z);
+    const projectPanel = CreateDescriptionPanel(scene, projectsButton, "My Projects", projectsButton.position.x, projectsButton.position.y-.1, projectsButton.position.z);
+    const educationPanel = CreateDescriptionPanel(scene, educationButton, "My Education", educationButton.position.x, educationButton.position.y-.1, educationButton.position.z);
+
     // set the name so it cant be referenced to close and open functions
-    screenMesh.name = 'screenMesh';
+    aboutPanel.name = 'aboutPanel';
+    experiencePanel.name = 'experiencePanel';
+    projectPanel.name = 'projectPanel';
+    educationPanel.name = 'educationPanel';
     
-    screenMesh.position.set(camera.position.x-.5, camera.position.y+.5, camera.position.z+.5); 
-    screenMesh.visible = false; 
-    scene.add(screenMesh);
+    aboutPanel.visible = false;
+    experiencePanel.visible = false;
+    projectPanel.visible = false;
+    educationPanel.visible = false; 
 
-    const updateBubbleRotation = () => {
+    const updateSectionRotation = () => {
       if (!cameraRef.current) return;
     
-      [yellowBubble, tealBubble, pinkBubble, purpleBubble].forEach((bubbleGroup) => {
+      [aboutButton, experienceButton, projectsButton, educationButton, aboutPanel, experiencePanel, projectPanel, educationPanel].forEach((bubbleGroup) => {
         const cameraPosition = cameraRef.current!.position.clone();
         
         // Calculate the direction from the bubble to the camera
@@ -256,77 +252,48 @@ const ThreeScene: React.FC = () => {
       });
     };
 
-    // mouse event listeneer
-    const onMouseMove = (event: MouseEvent) => {
-      if (!sceneRef.current || !cameraRef.current) return;
-
-      const mouse = new THREE.Vector2();
-        // Calculate mouse position in normalized device coordinates (-1 to +1) for both components
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; 
-
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(mouse, cameraRef.current);
-
-      const intersects = raycaster.intersectObjects(bubblesRef.current);
-      if (intersects.length > 0) {
+    // event listener for button
+    abouthtmlButton.addEventListener('click', () => {
+      scene.add(aboutPanel);
+      if(!aboutPanel.visible){
+        slideOpenScreen(sceneRef, "aboutPanel", "aboutSection");
       }
-    };
+    });
 
-    const onClick = (event: MouseEvent) => {
-      if (!sceneRef.current || !cameraRef.current) return;
-    
-      const mouse = new THREE.Vector2();
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(mouse, cameraRef.current);
-    
-      const intersects = raycaster.intersectObjects(bubblesRef.current, true);
-      if (intersects.length > 0) {
-        const intersectedObject = intersects[0].object;
-        if (intersectedObject instanceof THREE.Mesh) {
-        // Check if the intersected object is the parallelogram mesh
-        if (intersectedObject.name === "bubbleParallelogram" && 
-            intersectedObject.material instanceof THREE.MeshPhysicalMaterial) {
-          
-          const bubbleGroup = intersectedObject.parent;
-          if (bubbleGroup) {
-            console.log('Parallelogram clicked in bubble:', bubbleGroup.name);
-            
-            setIsOpen((prevIsOpen) => {
-              if (!prevIsOpen) {
-                slideOpenScreen();
-                console.log('Opening');
-                return true;
-              } else {
-                slideCloseScreen();
-                console.log('Closing');
-                return false;
-              }
-            });
-              setActiveSection(bubbleGroup.name);
-          }
-        }
+    experiencehtmlButton.addEventListener('click', () => {
+      scene.add(experiencePanel);
+      if(!experiencePanel.visible){
+        slideOpenScreen(sceneRef, "experiencePanel", "experienceSection");
       }
-    }
-    };
+    });
 
-    window.addEventListener('click', onClick);
-    window.addEventListener('mousemove', onMouseMove);
+    projectshtmlButton.addEventListener('click', () => {
+      scene.add(projectPanel);
+      if(!projectPanel.visible){
+        slideOpenScreen(sceneRef, "projectPanel", "projectSection");
+      }
+    });
+
+    educationhtmlButton.addEventListener('click', () => {
+      scene.add(educationPanel);
+      if(!educationPanel.visible){
+        slideOpenScreen(sceneRef, "educationPanel", "educationSection");
+      }
+    });
+
     const clock = new THREE.Clock();
 
     const animate = () => {
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      updateBubbleRotation();
+      updateSectionRotation();
 
       // float bubbles
-      Float(elapsedTime, purpleBubble, pinkBubble, yellowBubble,tealBubble);
+      Float(elapsedTime, aboutButton, projectsButton, experienceButton, educationButton);
       composer.render();
       controls.update();
+      css3dRenderer.render(scene, camera);
     };
 
     //animation for scene
@@ -334,10 +301,9 @@ const ThreeScene: React.FC = () => {
 
     //cleanup initial
     return () => {
-        (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('click', onClick);
+        (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})();
         mountRef.current?.removeChild(renderer.domElement);
+        mountRef.current?.removeChild(css3dRenderer.domElement);
       }
   }, []);
   
