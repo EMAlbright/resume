@@ -15,7 +15,7 @@ export const CreateDescriptionPanel = (scene: any, button: any, descriptionText:
     panel.style.fontSize = '20px';
     panel.style.color = '#333';
     panel.style.pointerEvents = 'auto';
-    panel.style.opacity = '0.85';
+    panel.style.opacity = '0.95';
 
     panel.appendChild(descriptionText);
 

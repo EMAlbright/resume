@@ -52,30 +52,43 @@ export const CreateAboutText = () => {
         const openTo = document.createElement('p');
         openTo.style.fontSize = '18px';
         openTo.innerHTML = `
-        Open to all work in software development
+        <strong>Open to all work in software development </strong>
         `
     
         const hometown = document.createElement('p');
         hometown.style.margin = '5px 0';
         hometown.style.fontSize = '18px';
         hometown.style.textAlign = 'center';
-        hometown.style.color = '#667';
+        hometown.style.color = '#0073e6';
         hometown.innerHTML = `
             <strong>Based out of Seattle, WA</strong><br>
+        `;
+
+        const languageTitle = document.createElement('p');
+        languageTitle.style.fontSize = '20px';
+        languageTitle.style.marginBottom = '20px';
+        languageTitle.innerHTML = `
+        <strong>Programming & Tools:</strong><br>
         `;
 
         const languages = document.createElement('p');
         languages.style.marginBottom = '20px';
         languages.style.fontSize = '20px';
+        languages.style.color = '#0073e6';
         languages.innerHTML = `
-        <strong>Top programming Languages:</strong><br>
-        <ul> 
-        <li style="font-weight: bold;"> Python </li> 
-        <li style="font-weight: bold;"> Typescript </li> 
-        <li style="font-weight: bold;"> Javascript </li>
-        <li style="font-weight: bold;"> Java </li> 
-        <li style="font-weight: bold;"> SQL </li> 
-        <li style="font-weight: bold;"> Rust </li>
+        <ul style="display: grid; grid-template-columns: repeat(3, 1fr); list-style: none; padding: 0;">
+        <li style="font-weight: bold; margin: 5px;">Python</li>
+        <li style="font-weight: bold; margin: 5px;">Typescript</li>
+        <li style="font-weight: bold; margin: 5px;">Javascript</li>
+        <li style="font-weight: bold; margin: 5px;">Java</li>
+        <li style="font-weight: bold; margin: 5px;">SQL</li>
+        <li style="font-weight: bold; margin: 5px;">React & Next.js</li>
+        <li style="font-weight: bold; margin: 5px;">Flask</li>
+        <li style="font-weight: bold; margin: 5px;">BS4 & Selenium</li>
+        <li style="font-weight: bold; margin: 5px;">PostgreSQL</li>
+        <li style="font-weight: bold; margin: 5px;">MongoDB</li>
+        <li style="font-weight: bold; margin: 5px;">AWS</li>
+        <li style="font-weight: bold; margin: 5px;">RESTful APIs</li>
         </ul>
          `;
 
@@ -99,6 +112,7 @@ export const CreateAboutText = () => {
 
         me.appendChild(openTo);
         me.appendChild(hometown);
+        me.appendChild(languageTitle);
         me.appendChild(languages);
         me.appendChild(contact);
         me.appendChild(socials);

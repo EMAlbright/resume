@@ -46,7 +46,7 @@ export const CreateEducationText = () => {
     universityTitle.innerHTML = `<span style="font-weight: bold;"> University of Washington </span>`;
     universityTitle.style.margin = '0';
     universityTitle.style.fontSize = '22px';
-    universityTitle.style.color = '#333';
+    universityTitle.style.color = 'black';
 
     const universityDetails = document.createElement('p');
     universityDetails.innerHTML = `
@@ -56,7 +56,7 @@ export const CreateEducationText = () => {
     `;
     universityDetails.style.margin = '5px 0';
     universityDetails.style.fontSize = '18px';
-    universityDetails.style.color = '#667';
+    universityDetails.style.color = '#0073e6';
 
     university.appendChild(universityTitle);
     university.appendChild(universityDetails);
@@ -69,7 +69,7 @@ export const CreateEducationText = () => {
     highSchoolTitle.innerHTML = `<span style="font-weight: bold;"> Woodinville High School </span>`;
     highSchoolTitle.style.margin = '0';
     highSchoolTitle.style.fontSize = '22px';
-    highSchoolTitle.style.color = '#333';
+    highSchoolTitle.style.color = 'black';
 
     const highSchoolDetails = document.createElement('p');
     highSchoolDetails.innerHTML = `
@@ -77,7 +77,7 @@ export const CreateEducationText = () => {
     `;
     highSchoolDetails.style.margin = '5px 0';
     highSchoolDetails.style.fontSize = '18px';
-    highSchoolDetails.style.color = '#666';
+    highSchoolDetails.style.color = '#0073e6';
 
     highSchool.appendChild(highSchoolTitle);
     highSchool.appendChild(highSchoolDetails);
