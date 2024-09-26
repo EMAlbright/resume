@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Group } from 'three/examples/jsm/libs/tween.module.js';
 
 const CreateLine = (lineColor: any, x: number, y:number, z:number) => {
     const geometry = new THREE.BufferGeometry();

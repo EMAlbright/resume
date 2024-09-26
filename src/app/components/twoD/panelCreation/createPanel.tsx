@@ -1,7 +1,8 @@
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 import gsap from 'gsap'; 
+import * as THREE from 'three';
 
-export const CreateDescriptionPanel = (scene: any, button: any, descriptionText: any, x: number, y: number, z: number) => {
+export const CreateDescriptionPanel = (scene: THREE.Scene, button: CSS3DObject, descriptionText: HTMLDivElement, x: number, y: number, z: number) => {
     // Create panel container
     const panel = document.createElement('div');
     panel.style.width = '750px';

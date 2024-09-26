@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import ThreeScene from './components/threeD/exampleScene/mainScene';
 import Head from 'next/head';
 export default function Home() {
