@@ -17,7 +17,6 @@ import { CreateEducationText } from '../../twoD/panelText/educationpanel';
 import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
 import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
 import { CreateProjectText } from '../../twoD/panelText/projectpanel';
-import { stat } from 'fs';
 
 const stats = typeof window !== 'undefined' ? new Stats() : null;
 if (stats) {
