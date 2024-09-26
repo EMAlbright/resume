@@ -196,7 +196,7 @@ const ThreeScene: React.FC = () => {
     });
 
     // initial cameras scene setup
-    camera.lookAt(new THREE.Vector3(0, .5, 0));
+    camera.lookAt(new THREE.Vector3(0, 1.5, 0));
 
     // create 2d button with css renderer
     const abouthtmlButton = CreateHTMLbutton("About Me");
