@@ -54,7 +54,7 @@ export const CreateAboutText = () => {
         openTo.innerHTML = `
         <strong>Open to all work in software development </strong>
         `
-    
+        
         const hometown = document.createElement('p');
         hometown.style.margin = '5px 0';
         hometown.style.fontSize = '18px';
@@ -82,9 +82,9 @@ export const CreateAboutText = () => {
         <li style="font-weight: bold; margin: 5px;">Javascript</li>
         <li style="font-weight: bold; margin: 5px;">Java</li>
         <li style="font-weight: bold; margin: 5px;">SQL</li>
-        <li style="font-weight: bold; margin: 5px;">React & Next.js</li>
+        <li style="font-weight: bold; margin: 5px;">Rust</li>
         <li style="font-weight: bold; margin: 5px;">Flask</li>
-        <li style="font-weight: bold; margin: 5px;">BS4 & Selenium</li>
+        <li style="font-weight: bold; margin: 5px;">React & Next.js</li>
         <li style="font-weight: bold; margin: 5px;">PostgreSQL</li>
         <li style="font-weight: bold; margin: 5px;">MongoDB</li>
         <li style="font-weight: bold; margin: 5px;">AWS</li>

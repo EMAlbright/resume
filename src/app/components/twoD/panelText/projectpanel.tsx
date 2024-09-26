@@ -38,13 +38,6 @@ export const CreateProjectText = () => {
     `;
     document.head.appendChild(scrollbarStyles);
 
-    const sectionTitle = document.createElement('div');
-    sectionTitle.style.textAlign = 'center';
-    sectionTitle.style.fontSize = '28px';
-    sectionTitle.style.color = 'black';
-    sectionTitle.style.marginBottom = '20px';
-    sectionTitle.innerHTML = `<strong>Projects</strong><br>`;
-
     // main outline for each project
     // title, description, video demo, code link
     const createProjectEntry = (title: string, description: string, demoLink: string, codeLink = '') => {
@@ -62,7 +55,7 @@ export const CreateProjectText = () => {
         projectDescription.innerHTML = description;
         projectDescription.style.margin = '5px 0';
         projectDescription.style.fontSize = '18px';
-        projectDescription.style.color = '#667';
+        projectDescription.style.color = '#0073e6';
 
         const videoPlayer = document.createElement('video');
         videoPlayer.src = demoLink;
@@ -107,7 +100,6 @@ export const CreateProjectText = () => {
         '/demoVideos/resumeAI.mp4'
     );
 
-    textContainer.appendChild(sectionTitle);
     textContainer.appendChild(project1);
     textContainer.appendChild(project2);
     textContainer.appendChild(project3);

@@ -6,7 +6,6 @@ export const CreateHTMLbutton = (text: string) => {
     button.style.padding = '10px';
     button.style.backgroundColor = '#A4D7E1';
     button.style.color = 'black';
-    button.style.border = 'none';
     button.style.borderRadius = '5px';
     button.style.cursor = 'pointer';
     button.style.pointerEvents = 'auto';

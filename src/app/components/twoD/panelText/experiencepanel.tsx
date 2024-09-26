@@ -38,60 +38,68 @@
         `;
         document.head.appendChild(scrollbarStyles);
     
-        const sectionTitle = document.createElement('div');
-        sectionTitle.style.textAlign = 'center';
-        sectionTitle.style.fontSize = '28px';
-        sectionTitle.style.color = 'black';
-        sectionTitle.style.marginBottom = '20px';
-        sectionTitle.innerHTML = `<strong>Projects</strong><br>`;
-    
         // main outline for each project
         // title, description, video demo, code link
         const createExperienceEntry = (title: string, description: string, date: string) => {
+            // main
             const project = document.createElement('div');
             project.style.marginBottom = '20px';
-    
+            project.style.padding = '10px'; 
+            // add light border around each experience
+            project.style.border = '1px solid #999'; 
+            //work title
             const workTitle = document.createElement('h3');
             workTitle.textContent = title;
             workTitle.style.margin = '0';
             workTitle.style.fontSize = '22px';
             workTitle.style.color = '#333';
-    
+            // description of job
             const workDescription = document.createElement('p');
             workDescription.innerHTML = description;
             workDescription.style.margin = '5px 0';
             workDescription.style.fontSize = '18px';
-            workDescription.style.color = '#667';
-    
-            project.appendChild(workTitle);
-            project.appendChild(workDescription);
-    
-    
+            workDescription.style.color = '#0073e6';
+            
+            // create container to put in right
+            const dateContainer = document.createElement('div'); 
+            dateContainer.style.display = 'flex';             
+            dateContainer.style.justifyContent = 'flex-end';  
+        
+            const dateElement = document.createElement('span'); 
+            dateElement.textContent = date;
+            dateElement.style.fontSize = '16px';             
+            dateElement.style.color = '#667'; 
+            
+            // add all elements
+            dateContainer.appendChild(dateElement); 
+            project.appendChild(workTitle);         
+            project.appendChild(workDescription);   
+            project.appendChild(dateContainer);     
+        
             return project;
         };
     
-        const project1 = createExperienceEntry(
+        const job1 = createExperienceEntry(
+            'Independent Software Developer',
             '',
-            '',
-            ''        
+            'March 2024 - Present'        
         );
     
-        const project2 = createExperienceEntry(
-            '',
-            '',
-            ''
+        const job2 = createExperienceEntry(
+            'Software Developer - UW Capstone',
+            'Developed a mobile budgeting application using React Native and TypeScript, leveraging Firebase for real-time data synchronization and user authentication. The app empowers users to manage their income and expenses, providing optimized budgeting strategies with ML models, spending analytics, and goal tracking features to enhance financial decision-making.',
+            'September - December 2024'
         );
     
-        const project3 = createExperienceEntry(
+        const job3 = createExperienceEntry(
+            'Restaraunt Server',
             '',
-            '',
-            ''
+            'June 2022 - Present'
         );
     
-        textContainer.appendChild(sectionTitle);
-        textContainer.appendChild(project1);
-        textContainer.appendChild(project2);
-        textContainer.appendChild(project3);
+        textContainer.appendChild(job1);
+        textContainer.appendChild(job2);
+        textContainer.appendChild(job3);
     
         return textContainer;
 };
