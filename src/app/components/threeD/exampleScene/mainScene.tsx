@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef} from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -8,7 +8,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { Float } from '../../animations/updateBubbles';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
-import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+import { CSS3DRenderer} from 'three/addons/renderers/CSS3DRenderer.js';
 import { CreateButton } from '../../twoD/buttonCreation/createButton';
 import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
 import { CreateDescriptionPanel } from '../../twoD/panelCreation/createPanel';
@@ -18,7 +18,7 @@ import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
 import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
 import { CreateProjectText } from '../../twoD/panelText/projectpanel';
 
-let stats = new Stats();
+const stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 
 // create texture circle
@@ -303,7 +303,7 @@ const ThreeScene: React.FC = () => {
 
     //cleanup initial
     return () => {
-        (function(){let script=document.createElement('script');script.onload=function(){let stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})();
+        (function(){const script=document.createElement('script');script.onload=function(){const stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})();
         mountRef.current?.removeChild(renderer.domElement);
         mountRef.current?.removeChild(css3dRenderer.domElement);
       }

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const CreateLine = (lineColor: any, x: number, y:number, z:number) => {
+const CreateLine = (lineColor: string, x: number, y:number, z:number) => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([x, y, z, x, y-.5, z]), 3));
     

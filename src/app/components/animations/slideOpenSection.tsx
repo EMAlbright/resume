@@ -1,6 +1,7 @@
 import gsap from 'gsap'; 
+import * as THREE from 'three';
 
-export const slideOpenScreen = (sceneRef: any, panelName: string, sectionName: string) => {
+export const slideOpenScreen = (sceneRef: React.MutableRefObject<THREE.Scene | null>, panelName: string, sectionName: string) => {
     if (!sceneRef.current) return;
     const screenMesh = sceneRef.current.getObjectByName(panelName);
     const button = sceneRef.current.getObjectByName(sectionName);
