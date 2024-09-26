@@ -1,3 +1,4 @@
+"use client";
 export const CreateEducationText = () => {
     const textContainer = document.createElement('div');
 

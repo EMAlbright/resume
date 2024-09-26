@@ -1,3 +1,4 @@
+"use client"
 export const CreateHTMLbutton = (text: string) => {
     const button = document.createElement('button');
     button.textContent = text;

@@ -1,3 +1,4 @@
+"use client";
 export const CreateProjectText = () => {
     const textContainer = document.createElement('div');
     

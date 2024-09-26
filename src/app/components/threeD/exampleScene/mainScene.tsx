@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useRef} from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -17,28 +17,18 @@ import { CreateEducationText } from '../../twoD/panelText/educationpanel';
 import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
 import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
 import { CreateProjectText } from '../../twoD/panelText/projectpanel';
+import { stat } from 'fs';
 
-const stats = new Stats();
-stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-
-// create texture circle
-const createCircleTexture = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-      gradient.addColorStop(0, 'rgba(255,255,255,1)');
-      gradient.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 32, 32);
-    }
-    return new THREE.CanvasTexture(canvas);
-  }
+const stats = typeof window !== 'undefined' ? new Stats() : null;
+if (stats) {
+  stats.showPanel(1);
+}
 
 const ThreeScene: React.FC = () => {
-  stats.begin()
+  if(stats){
+    stats.begin();
+  }
+  
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -56,6 +46,23 @@ const ThreeScene: React.FC = () => {
 
   useEffect(() => {
     if (!mountRef.current) return;
+    if (typeof window === 'undefined') return;
+    // create texture circle
+    const createCircleTexture = () => {
+      if (typeof window === 'undefined') return null;
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 32, 32);
+      }
+    return new THREE.CanvasTexture(canvas);
+  }
 
     //create scene, camera , renderer
     const scene = new THREE.Scene();
@@ -308,8 +315,9 @@ const ThreeScene: React.FC = () => {
       }
   }, []);
   
-
-  stats.end();
+  if(stats){
+    stats.end();
+  }
 
   return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
 };

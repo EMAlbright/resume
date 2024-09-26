@@ -1,5 +1,9 @@
-import ThreeScene from './components/threeD/exampleScene/mainScene';
+"use client";
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
+
+const ThreeScene = dynamic(() => import('./components/threeD/exampleScene/mainScene'), { ssr: false });
+
 export default function Home() {
   return (
     <>

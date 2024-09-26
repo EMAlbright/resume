@@ -1,4 +1,5 @@
-    export const CreateExperienceText = () => {
+"use client";
+export const CreateExperienceText = () => {
         const textContainer = document.createElement('div');
         
         const fontLink = document.createElement('link');
