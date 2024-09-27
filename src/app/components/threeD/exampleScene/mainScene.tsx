@@ -26,7 +26,7 @@ const ThreeScene: React.FC = () => {
   const composerRef = useRef<EffectComposer | null>(null);
 
   const loader = new GLTFLoader();
-  // css renderer
+  // cs renderer
   const css3dRendererRef = useRef<CSS3DRenderer | null>(null);
 
   const params = {
