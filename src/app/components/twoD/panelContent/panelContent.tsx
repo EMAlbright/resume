@@ -60,7 +60,7 @@ export const CreateAboutText = () => (
     <h2 className="text-2xl mb-4 mt-4">Networked Multiplayer API</h2>
     <p className="text-xl mb-4 text-custom-green">
       Worked alongside two other peers to create a networked multiplayer API as a final project for our Game Engine Development course. 
-      Our work was published in Apress `Build your own 2D Game Engine, Second Edition`. Below, you can see a short demo of our implementation
+      Our work was published in Apress &apos;Build your own 2D Game Engine, Second Edition&apos;. Below, you can see a short demo of our implementation
       of this API in a simple zombie shooter esque game, where all 3 of us control our own respective squares from our local machines.
     </p>
     <div className="flex justify-center items-center mb-4">
