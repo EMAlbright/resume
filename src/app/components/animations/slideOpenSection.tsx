@@ -12,7 +12,7 @@ export const slideOpenScreen = (sceneRef: React.MutableRefObject<THREE.Scene | n
       gsap.to(screenMesh.scale, {
         y: .002, 
         x: .002,
-        duration: .25,
+        duration: .5,
         ease: "power2.inOut", 
         OnComplete: () =>{
           screenMesh.visible = true;

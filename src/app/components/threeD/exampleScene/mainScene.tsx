@@ -1,5 +1,6 @@
 "use client"
-import React, { useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
+import SidePanel from '../../twoD/sidePanel/sidePanel';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -11,18 +12,14 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { CSS3DRenderer} from 'three/addons/renderers/CSS3DRenderer.js';
 import { CreateButton } from '../../twoD/buttonCreation/createButton';
 import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
-import { CreateDescriptionPanel } from '../../twoD/panelCreation/createPanel';
-import { slideOpenScreen } from '../../animations/slideOpenSection';
-import { CreateEducationText } from '../../twoD/panelText/educationpanel';
-import { CreateAboutText } from '../../twoD/panelText/aboutpanel';
-import { CreateExperienceText } from '../../twoD/panelText/experiencepanel';
-import { CreateProjectText } from '../../twoD/panelText/projectpanel';
+import { CreateAboutText, CreateEducationText, CreateProjectText, CreateExperienceText } from '../../twoD/panelContent/panelContent';
 
 const stats = new Stats();
 stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 
 // create texture circle
 const createCircleTexture = () => {
+  if(!document) return;
     const canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
@@ -39,6 +36,7 @@ const createCircleTexture = () => {
 
 const ThreeScene: React.FC = () => {
   stats.begin()
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -90,8 +88,8 @@ const ThreeScene: React.FC = () => {
     //restrict orbit controls
     // cant go below plane
     //controls.enableZoom = false;
-    controls.maxDistance = 3;
-    controls.minDistance = 1;
+    controls.maxDistance = 2.25;
+    controls.minDistance = 1.5;
     controls.maxPolarAngle = Math.PI / 2; 
 
     // pass renderer to composer . scene and camera
@@ -213,30 +211,12 @@ const ThreeScene: React.FC = () => {
     educationButton.name = 'educationSection';
     scene.add(educationButton);
 
-    const aboutText = CreateAboutText();
-    const aboutPanel = CreateDescriptionPanel(scene, aboutButton, aboutText, aboutButton.position.x, aboutButton.position.y-.1, aboutButton.position.z);
-    const experienceText = CreateExperienceText();
-    const experiencePanel = CreateDescriptionPanel(scene, experienceButton, experienceText, experienceButton.position.x, experienceButton.position.y-.1, experienceButton.position.z);
-    const projectext = CreateProjectText();
-    const projectPanel = CreateDescriptionPanel(scene, projectsButton, projectext, projectsButton.position.x, projectsButton.position.y-.1, projectsButton.position.z);
-    const educationText = CreateEducationText();
-    const educationPanel = CreateDescriptionPanel(scene, educationButton, educationText, educationButton.position.x, educationButton.position.y-.1, educationButton.position.z);
 
-    // set the name so it cant be referenced to close and open functions
-    aboutPanel.name = 'aboutPanel';
-    experiencePanel.name = 'experiencePanel';
-    projectPanel.name = 'projectPanel';
-    educationPanel.name = 'educationPanel';
-    
-    aboutPanel.visible = false;
-    experiencePanel.visible = false;
-    projectPanel.visible = false;
-    educationPanel.visible = false; 
 
     const updateSectionRotation = () => {
       if (!cameraRef.current) return;
     
-      [aboutButton, experienceButton, projectsButton, educationButton, aboutPanel, experiencePanel, projectPanel, educationPanel].forEach((bubbleGroup) => {
+      [aboutButton, experienceButton, projectsButton, educationButton].forEach((bubbleGroup) => {
         const cameraPosition = cameraRef.current!.position.clone();
         
         // Calculate the direction from the bubble to the camera
@@ -256,31 +236,19 @@ const ThreeScene: React.FC = () => {
 
     // event listener for button
     abouthtmlButton.addEventListener('click', () => {
-      scene.add(aboutPanel);
-      if(!aboutPanel.visible){
-        slideOpenScreen(sceneRef, "aboutPanel", "aboutSection");
-      }
+      setOpenPanel('about');
     });
 
     experiencehtmlButton.addEventListener('click', () => {
-      scene.add(experiencePanel);
-      if(!experiencePanel.visible){
-        slideOpenScreen(sceneRef, "experiencePanel", "experienceSection");
-      }
+      setOpenPanel('experience');
     });
 
     projectshtmlButton.addEventListener('click', () => {
-      scene.add(projectPanel);
-      if(!projectPanel.visible){
-        slideOpenScreen(sceneRef, "projectPanel", "projectSection");
-      }
+      setOpenPanel('projects');
     });
 
     educationhtmlButton.addEventListener('click', () => {
-      scene.add(educationPanel);
-      if(!educationPanel.visible){
-        slideOpenScreen(sceneRef, "educationPanel", "educationSection");
-      }
+      setOpenPanel('education');
     });
 
     const clock = new THREE.Clock();
@@ -308,11 +276,46 @@ const ThreeScene: React.FC = () => {
         mountRef.current?.removeChild(css3dRenderer.domElement);
       }
   }, []);
+
+  const closePanel = () => {
+    setOpenPanel(null);
+    if (sceneRef.current) {
+      ['aboutSection', 'experienceSection', 'projectSection', 'educationSection'].forEach(sectionName => {
+        const button = sceneRef.current!.getObjectByName(sectionName);
+        if (button) button.visible = true;
+      });
+    }
+  };
+
+  const getPanelContent = (panelName: string) => {
+    switch (panelName) {
+      case 'about':
+        return CreateAboutText();
+      case 'experience':
+        return CreateExperienceText();
+      case 'projects':
+        return CreateProjectText();
+      case 'education':
+        return CreateEducationText();
+      default:
+        return null;
+    }
+  };
   
 
   stats.end();
 
-  return <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />;
+  return (
+    <>
+      <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />
+      <SidePanel
+        isOpen={openPanel !== null}
+        onClose={closePanel}
+        content={openPanel ? getPanelContent(openPanel) : null}
+        currentSection={openPanel}
+      />
+    </>
+  );
 };
 
 export default ThreeScene;
