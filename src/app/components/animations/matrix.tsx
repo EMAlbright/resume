@@ -11,6 +11,7 @@ const MatrixTextEffect: React.FC<MatrixTextEffectProps> = ({ text, onComplete })
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if(!document) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;

@@ -15,24 +15,7 @@ import { CreateHTMLbutton } from '../../twoD/buttonCreation/createHTMLbutton';
 import { CreateAboutText, CreateEducationText, CreateProjectText, CreateExperienceText } from '../../twoD/panelContent/panelContent';
 
 const stats = new Stats();
-stats.showPanel( 1 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-
-// create texture circle
-const createCircleTexture = () => {
-  if(!document) return;
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-      gradient.addColorStop(0, 'rgba(255,255,255,1)');
-      gradient.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 32, 32);
-    }
-    return new THREE.CanvasTexture(canvas);
-  }
+stats.showPanel( 1 ); 
 
 const ThreeScene: React.FC = () => {
   stats.begin()
@@ -53,7 +36,25 @@ const ThreeScene: React.FC = () => {
   }
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    if (!mountRef.current || typeof window === 'undefined') return;
+
+      // create texture circle
+    const createCircleTexture = () => {
+    if(typeof window === 'undefined' || !document) return null;
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 32, 32);
+      }
+      return new THREE.CanvasTexture(canvas);
+    }
+  
 
     //create scene, camera , renderer
     const scene = new THREE.Scene();
