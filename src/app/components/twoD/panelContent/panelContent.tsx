@@ -60,7 +60,7 @@ export const CreateAboutText = () => (
     <h2 className="text-2xl mb-4 mt-4">Networked Multiplayer API</h2>
     <p className="text-xl mb-4 text-custom-green">
       Worked alongside two other peers to create a networked multiplayer API as a final project for our Game Engine Development course. 
-      Our work was published in Apress' `Build your own 2D Game Engine, Second Edition`. Below, you can see a short demo of our implementation
+      Our work was published in Apress `Build your own 2D Game Engine, Second Edition`. Below, you can see a short demo of our implementation
       of this API in a simple zombie shooter esque game, where all 3 of us control our own respective squares from our local machines.
     </p>
     <div className="flex justify-center items-center mb-4">
@@ -79,7 +79,7 @@ export const CreateAboutText = () => (
     
     <h2 className="text-2xl mb-4 mt-16">Satire Trade - A Trading Simulator</h2>
     <p className="text-xl mb-4 text-custom-green">
-    A market trading simulator that allows users to practice trading stocks as well as cryptocurrencies with 'money' and see performance results.
+    A market trading simulator that allows users to practice trading stocks as well as cryptocurrencies with &apos;money&apos; and see performance results.
     This web app also allows users to backtest popular trading strategies over a specified timeline with S&P stocks.
     </p>
     <div className="flex justify-center items-center mb-4">
