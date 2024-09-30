@@ -19,7 +19,6 @@ stats.showPanel( 1 );
 
 const ThreeScene: React.FC = () => {
   stats.begin()
-  const [isLoading, setIsLoading] = useState(true);
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -38,9 +37,6 @@ const ThreeScene: React.FC = () => {
 
   useEffect(() => {
     if (!mountRef.current || typeof window === 'undefined') return;
-
-    let modelLoaded = false;
-    let sceneSetup = false;
 
       // create texture circle
     const createCircleTexture = () => {
@@ -188,9 +184,6 @@ const ThreeScene: React.FC = () => {
         camera.position.set(0, .5, 2);
         controls.update();
 
-        modelLoaded = true;
-        if(sceneSetup) setIsLoading(false);
-
     }, undefined, function (error){
         console.error(error);
     });
@@ -268,14 +261,10 @@ const ThreeScene: React.FC = () => {
       updateSectionRotation();
 
       // float bubbles
-      Float(elapsedTime, aboutButton, projectsButton, experienceButton, educationButton);      
+      Float(elapsedTime, aboutButton, projectsButton, experienceButton, educationButton);
       composer.render();
       controls.update();
       css3dRenderer.render(scene, camera);
-      if (!sceneSetup) {
-        sceneSetup = true;
-        if (modelLoaded) setIsLoading(false);
-      }
     };
 
     //animation for scene
@@ -319,21 +308,13 @@ const ThreeScene: React.FC = () => {
 
   return (
     <>
-      {isLoading ? (
-        <div style={{ width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <p>Loading...</p>
-        </div>
-      ) : (
-        <>
-          <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />
-          <SidePanel
-            isOpen={openPanel !== null}
-            onClose={closePanel}
-            content={openPanel ? getPanelContent(openPanel) : null}
-            currentSection={openPanel}
-          />
-        </>
-      )}
+      <div ref={mountRef} style={{ width: '100%', height: '100vh' }} />
+      <SidePanel
+        isOpen={openPanel !== null}
+        onClose={closePanel}
+        content={openPanel ? getPanelContent(openPanel) : null}
+        currentSection={openPanel}
+      />
     </>
   );
 };
