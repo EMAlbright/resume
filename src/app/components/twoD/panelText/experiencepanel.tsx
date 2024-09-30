@@ -93,7 +93,7 @@ export const CreateExperienceText = () => {
         );
     
         const job3 = createExperienceEntry(
-            'Restaraunt Server',
+            'Restaurant Server',
             '',
             'June 2022 - Present'
         );
