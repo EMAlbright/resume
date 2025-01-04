@@ -1,55 +1,92 @@
 export const CreateAboutText = () => (
-  <div className="mt-12" style={{ fontFamily: "'Oxanium', sans-serif" }}>
-  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200&display=swap" rel="stylesheet"></link>
-  <h2 className="text-4xl text-center mb-4">Hi there! My name is Ethan Albright</h2>
-  <p className="text-2xl text-center mb-4 text-custom-green">Open to all work in software development</p>
-  <p className="text-xl text-center font-strong text-custom-green mb-12">Based out of Seattle, WA</p>
-  <h3 className="text-4xl text-center mb-10 ">Languages & Tools I use:</h3>
-      <div className="grid grid-cols-3 gap-4 text-xl text-center">
+  <div className="mt-16" style={{ fontFamily: "'Oxanium', sans-serif" }}>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200&display=swap" rel="stylesheet"></link>
+
+    <h2 className="text-4xl text-center mb-6">Hi there! My name is Ethan Albright</h2>
+    <p className="text-xl text-center mb-6 text-custom-green">
+      Aspiring software developer who creates purposeful applications with a variety of technologies and tools.
+    </p>
+    <p className="text-lg text-center font-strong text-custom-green mb-10">
+      Based out of Seattle, WA
+    </p>
+    <h3 className="text-3xl text-center mb-8">When I&apos;m Not Coding:</h3>
+    <p className="text-lg text-center text-custom-green mb-12">
+      Outside of software and hardware, I enjoy playing chess, watching UFC, working out, and hanging out with my friends.
+    </p>
+
+    <h3 className="text-3xl text-center mb-8">What I&apos;m Working On:</h3>
+    <p className="text-lg text-center text-custom-green font-medium mb-16 leading-relaxed">
+      I am currently building an intelligent autonomous robot, leveraging the power of open-source vision and language models, along with other APIs. 
+      There has never been a better time for independent developers to innovate and scale than now, and I plan to fully seize this opportunity. 
+      My project combines a Raspberry Pi 5, a camera, various hardware components, and Python to bring this idea to life. 
+      Along the way, I am continuously learning about new technologies to enhance my skills and push the boundaries of what is possible.
+    </p>
+
+    <h3 className="text-3xl text-center mb-8">Languages & Tools I Use:</h3>
+    <div className="grid grid-cols-3 gap-6 text-lg text-center mb-20">
       <div>Python</div>
-      <div>Typescript</div>
-      <div>Javascript</div>
+      <div>TypeScript/JavaScript</div>
       <div>Java</div>
       <div>SQL</div>
-      <div>Rust</div>
-      <div>Flask</div>
-      <div>React & Next.js</div>
       <div>PostgreSQL</div>
       <div>MongoDB</div>
+      <div>Flask</div>
+      <div>React & Next.js</div>
+      <div>React Native</div>
+      <div>Firebase</div>
       <div>AWS</div>
       <div>RESTful APIs</div>
-      </div>
-  <div className="text-2xl text-center mt-20 mb-10 text-custom-green"> <p>Feel free to contact me at EthanMacAlbright@gmail.com</p></div>
-  <div className="text-l text-center"> 
-    <p>
-    <a href='https://www.linkedin.com/in/ethan-albright-2928721b8/' target='_blank' style={{ display: 'inline-block', marginRight: '10px' }}>
-      <img src='/images/linkedin.png' alt='LinkedIn' style={{ width: '180px', height: '120px' }} />
-    </a>
-    </p>
-    <p>
-    <a href='https://github.com/EMAlbright' target='_blank' style={{ display: 'inline-block' }}>
-      <img src='/images/github.png' alt='GitHub' style={{ width: '80px', height: '80px' }} />
-    </a>
-    </p>
+    </div>
+
+    <div className="text-2xl text-center text-custom-green mb-12">
+      <p>Feel free to contact me at <div className="text-3xl">EthanMacAlbright@gmail.com</div></p>
+    </div>
+
+    <div className="text-center">
+      <p>
+        <a
+          href="https://www.linkedin.com/in/ethan-albright-2928721b8/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'inline-block', marginRight: '15px' }}
+        >
+          <img src="/images/linkedin.png" alt="LinkedIn" style={{ width: '180px', height: '120px' }} />
+        </a>
+      </p>
+      <p>
+        <a
+          href="https://github.com/EMAlbright"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'inline-block' }}
+        >
+          <img src="/images/github.png" alt="GitHub" style={{ width: '80px', height: '80px' }} />
+        </a>
+      </p>
+    </div>
   </div>
-  </div>
-  );
+);
+
   
   export const CreateExperienceText = () => (
     <div className="text-center mt-12" style={{ fontFamily: "'Oxanium', sans-serif" }}>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500&display=swap" rel="stylesheet"></link>
     <div>
-      <h2 className="text-2xl mb-4">Independent Software Developer</h2>
-      <p className="text-xl text-custom-green mb-12">June 2024 - Present</p>
+      <h2 className="text-2xl mb-4">Part Time: Server at Piatti Restaurant</h2>
+      <p className="text-xl text-custom-green mb-12">June 2022 - Present</p>
     </div>
     <div>
-      <h2 className="text-2xl mb-4">Software Developer - Capstone</h2>
-      <p className="text-xl text-custom-green mb-4">September 2024 - Present</p>
-      <p className="text-xl text-custom-green">Currently working on a financial budgeting mobile application tailored towards students. 
-        Working with industry experts as well as faculty to deliver weekly milestones and have a deliverable product
-        by the end of the semester.</p>
+      <h2 className="text-2xl mb-4">Independent Software Developer</h2>
+      <p className="text-xl text-custom-green mb-4">June 2023 - Present</p>
+      <p className="text-xl text-custom-green mb-12"> Continuously building and learning. I dedicate my time to developing real-world projects, honing my technical skills, and staying up to date with emerging technologies.</p>
     </div>
-
+    <div>
+      <h2 className="text-2xl mb-4">Capstone: Software Developer</h2>
+      <p className="text-xl text-custom-green mb-4">September 2024 - December 2024</p>
+      <p className="text-xl text-custom-green">Created a group financial budgeting and expense tracking cross platform mobile application. 
+        Worked with industry experts, faculty members, and stakeholders in order to deliver weekly milestones. Successfully delivered a finished product
+        by the end of the quarter.</p>
+    </div>
   </div>
   );
   
@@ -57,7 +94,25 @@ export const CreateAboutText = () => (
     <div className="mt-12" style={{ fontFamily: "'Oxanium', sans-serif" }}>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500&display=swap" rel="stylesheet"></link>
     <div className="text-center">
-    <h2 className="text-2xl mb-4 mt-4">Networked Multiplayer API</h2>
+
+    <h2 className="text-2xl mb-4 mt-4">Unifund - A Group Budgeting and Expense Tracker</h2>
+    <p className="text-xl mb-4 text-custom-green">
+      UniFund was my capstone project (completed in autumn 2024) and is designed to help groups effectively manage collective expenses and shared financial obligations.
+      This cross native mobile application enables users to create joint budgeting plans, allocate funds, assign roles within the group, and track spending habits and expenses transparently. 
+      It also allows members to confirm payments made among one another, fostering accountability.
+      Users can propose changes to group budgets or their specific categories by creating petitions, which are then subject to a group vote for approval. 
+      To support these functionalities, I implemented a notification system, search and invitation features, real-time data updates, and a comprehensive NoSQL database structure.
+      UniFund addresses a common but often overlooked challenge faced by roommates and other established groups: managing inter-group finances. 
+    </p>
+      <div className="text-xl">Scan This QR Code To Try It Out</div>
+      <div className="text-s">Note*: Expo Go Must Be Downloaded To Use This Application</div>
+      <div className="flex justify-center mb-8 mt-8">
+      <img src='/images/expo.png' alt='UniFund QR Code' style={{ width: '160px', height: '160px' }} />
+      </div>
+    <a href="https://github.com/EMAlbright/PUBLIC_UniFund" target="_blank">View Code</a>
+    
+
+    <h2 className="text-2xl mb-4 mt-16">Networked Multiplayer API</h2>
     <p className="text-xl mb-4 text-custom-green">
       Worked alongside two other peers to create a networked multiplayer API as a final project for our Game Engine Development course. 
       Our work was published in Apress &apos;Build your own 2D Game Engine, Second Edition&apos;. Below, you can see a short demo of our implementation
@@ -124,9 +179,30 @@ export const CreateAboutText = () => (
       <h2 className="text-4xl font-bold mb-4 mt-4">University of Washington</h2>
       <p className="text-2xl mb-4">2020 - 2025</p>
       <p className="text-2xl text-custom-green">B.a.S of Applied Computing</p>
-      <p className="text-2xl text-custom-green mb-12">Minor in Data Science & Business Administration</p>
-      <h2 className="text-4xl font-bold mb-4">Woodinville High School</h2>
+      <p className="text-2xl text-custom-green mb-10">Minor in Data Science & Business Administration</p>
+      <h4 className="text-xl text-custom-green mb-8">Relevant Courses (Besides The Basics):</h4>
+      <div className="grid grid-cols-3 gap-4 text-l text-center">
+        <div> Applied Algorithmics </div>
+        <div> Programming For Data Science</div>
+        <div> Data Visualization </div>
+        <div> Game Engine Development </div>
+        <div> Matrix Algebra </div>
+        <div> Database Systems </div>
+        <div> Product Development </div>
+        <div> Network Architecture </div>
+        <div> Web Media Programming </div>
+      </div>
+      <h2 className="text-4xl font-bold mb-4 mt-12">Woodinville High School</h2>
       <p className="text-2xl mb-4">2016 - 2020</p>
-      <p className="text-2xl text-custom-green">G.E.D</p>
+      <p className="text-2xl text-custom-green mb-6">G.E.D</p>
+      <h4 className="text-xl text-custom-green mb-8">Activities While Attending: </h4>
+      <div className="grid grid-cols-2 gap-4 text-l text-center">
+        <div> DECA </div>
+        <div> Spanish Club </div>
+        <div> National Honor Society </div>
+        <div> Unified Soccer Coach </div>
+        <div> School Student Store </div>
+        <div> Basketball, Football, & Soccer </div>
+      </div>
     </div>
   );
