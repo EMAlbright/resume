@@ -72,20 +72,14 @@ export const CreateAboutText = () => (
     <div className="text-center mt-12" style={{ fontFamily: "'Oxanium', sans-serif" }}>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500&display=swap" rel="stylesheet"></link>
     <div>
-      <h2 className="text-2xl mb-4">Part Time: Server at Piatti Restaurant</h2>
-      <p className="text-xl text-custom-green mb-12">June 2022 - Present</p>
-    </div>
-    <div>
-      <h2 className="text-2xl mb-4">Independent Software Developer</h2>
-      <p className="text-xl text-custom-green mb-4">June 2023 - Present</p>
-      <p className="text-xl text-custom-green mb-12"> Continuously building and learning. I dedicate my time to developing real-world projects, honing my technical skills, and staying up to date with emerging technologies.</p>
-    </div>
-    <div>
-      <h2 className="text-2xl mb-4">Capstone: Software Developer</h2>
-      <p className="text-xl text-custom-green mb-4">September 2024 - December 2024</p>
-      <p className="text-xl text-custom-green">Created a group financial budgeting and expense tracking cross platform mobile application. 
-        Worked with industry experts, faculty members, and stakeholders in order to deliver weekly milestones. Successfully delivered a finished product
-        by the end of the quarter.</p>
+      <h2 className="text-2xl mb-4">Software Developer: Fast Enterprises</h2>
+      <p className="text-xl text-custom-green mb-12">August 2025 - Present</p>
+      <p className="text-xl">
+        As a Software Developer, I worked on modernizing legacy government systems by converting applications from VB.NET to C#. 
+        This involved redesigning and re-implementing core functionality to improve performance, maintainability, and long-term scalability.
+        I also helped migrate databases from Microsoft SQL Server to PostgreSQL, resolving compatibility issues and optimizing queries to improve efficiency and system performance. 
+        Throughout both efforts, I debugged and troubleshot issues across the application and database layers to support a smooth transition to the modernized systems.
+      </p>
     </div>
   </div>
   );
